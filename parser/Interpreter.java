@@ -3,6 +3,7 @@ package parser;
 import nodes.Node;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Interpreter {
@@ -20,6 +21,28 @@ public class Interpreter {
         }
     }
 
+    public static float getValue(Object instruction, HashMap<String, Float> memory) {
+        float val;
+
+        try {
+            val = (Float) instruction;
+        } catch (Exception exception) {
+            if(String.valueOf(instruction).startsWith("gg")) {
+                int index = Math.round(
+                        memory.get(
+                                String.format("g%d", (String.valueOf(instruction).charAt(2) - '0'))
+                        )
+                );
+
+                val = memory.get(String.format("g%d", index));
+            } else {
+                val = memory.get((String) instruction);
+            }
+        }
+
+        return val;
+    }
+
     public static void executeInstruction(Object[] instruction, HashMap<String, Float> memory) {
         int opCode = (Integer) instruction[0];
 
@@ -31,25 +54,18 @@ public class Interpreter {
             repetitions = Math.round(memory.get((String) instruction[7]));
         }
 
+        for(int i = 0; i < instruction.length; i ++) {
+            if(String.valueOf(instruction[i]).equals("%gg")) {
+
+            }
+        }
+
         for(int l = 0; l < repetitions; l++) {
             switch (opCode) {
                 //ADD
                 case 0: {
-                    float valA;
-
-                    try {
-                        valA = (Float) instruction[1];
-                    } catch (Exception exception) {
-                        valA = memory.get((String) instruction[1]);
-                    }
-
-                    float valB;
-
-                    try {
-                        valB = (Float) instruction[2];
-                    } catch (Exception exception) {
-                        valB = memory.get((String) instruction[2]);
-                    }
+                    float valA = getValue(instruction[1], memory);
+                    float valB = getValue(instruction[2], memory);
 
                     float result = valA + valB;
                     memory.put((String) instruction[8], result);
@@ -59,21 +75,8 @@ public class Interpreter {
 
                 //SUB
                 case 1: {
-                    float valA;
-
-                    try {
-                        valA = (Float) instruction[1];
-                    } catch (Exception exception) {
-                        valA = memory.get((String) instruction[1]);
-                    }
-
-                    float valB;
-
-                    try {
-                        valB = (Float) instruction[2];
-                    } catch (Exception exception) {
-                        valB = memory.get((String) instruction[2]);
-                    }
+                    float valA = getValue(instruction[1], memory);
+                    float valB = getValue(instruction[2], memory);
 
                     float result = valA - valB;
                     memory.put((String) instruction[8], result);
@@ -83,21 +86,8 @@ public class Interpreter {
 
                 //MUL
                 case 2: {
-                    float valA;
-
-                    try {
-                        valA = (Float) instruction[1];
-                    } catch (Exception exception) {
-                        valA = memory.get((String) instruction[1]);
-                    }
-
-                    float valB;
-
-                    try {
-                        valB = (Float) instruction[2];
-                    } catch (Exception exception) {
-                        valB = memory.get((String) instruction[2]);
-                    }
+                    float valA = getValue(instruction[1], memory);
+                    float valB = getValue(instruction[2], memory);
 
                     float result = valA * valB;
                     memory.put((String) instruction[8], result);
@@ -107,21 +97,8 @@ public class Interpreter {
 
                 //DIV
                 case 3: {
-                    float valA;
-
-                    try {
-                        valA = (Float) instruction[1];
-                    } catch (Exception exception) {
-                        valA = memory.get((String) instruction[1]);
-                    }
-
-                    float valB;
-
-                    try {
-                        valB = (Float) instruction[2];
-                    } catch (Exception exception) {
-                        valB = memory.get((String) instruction[2]);
-                    }
+                    float valA = getValue(instruction[1], memory);
+                    float valB = getValue(instruction[2], memory);
 
                     float result = valA / valB;
                     memory.put((String) instruction[8], result);
@@ -129,29 +106,26 @@ public class Interpreter {
                     break;
                 }
 
+                //SET
                 case 4: {
-                    float val;
+                    float val = getValue(instruction[2], memory);
 
-                    try {
-                        val = (Float) instruction[2];
-                    } catch (Exception exception) {
-                        val = memory.get((String) instruction[2]);
+                    if(String.valueOf(instruction[1]).startsWith("gg")) {
+                        int index = Math.round(memory.get(
+                                String.format("g%d", String.valueOf(instruction[1]).charAt(2) - '0')
+                        ));
+
+                        memory.put(String.format("g%d", index), val);
+                    } else {
+                        memory.put((String) instruction[1], val);
                     }
-
-                    memory.put((String) instruction[1], val);
 
                     break;
                 }
 
                 //PRINT
                 case 5: {
-                    float val;
-
-                    try {
-                        val = (Float) instruction[1];
-                    } catch (Exception exception) {
-                        val = memory.get((String) instruction[1]);
-                    }
+                    float val = getValue(instruction[1], memory);
 
                     if (val == Math.round(val)) {
                         System.out.print((int) val);
@@ -179,21 +153,8 @@ public class Interpreter {
                 }
 
                 case 8: {
-                    float valA;
-
-                    try {
-                        valA = (Float) instruction[1];
-                    } catch (Exception exception) {
-                        valA = memory.get((String) instruction[1]);
-                    }
-
-                    float valB;
-
-                    try {
-                        valB = (Float) instruction[2];
-                    } catch (Exception exception) {
-                        valB = memory.get((String) instruction[2]);
-                    }
+                    float valA = getValue(instruction[1], memory);
+                    float valB = getValue(instruction[2], memory);
 
                     switch ((Integer) instruction[3]) {
                         case 0:
@@ -259,13 +220,7 @@ public class Interpreter {
 
                 //PRINTLN
                 case 9: {
-                    float val;
-
-                    try {
-                        val = (Float) instruction[1];
-                    } catch (Exception exception) {
-                        val = memory.get((String) instruction[1]);
-                    }
+                    float val = getValue(instruction[1], memory);
 
                     if (val == Math.round(val)) {
                         System.out.println((int) val);

@@ -37,8 +37,12 @@ public class Parser {
                     args[i] = String.format("a%d", curr.id * 10 + slot);
                     memory.put((String) args[i], 0f);
                 } else if (tokens[i].startsWith("%")) {
-                    args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
-                    memory.put((String) args[i], 0f);
+                    if(tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
+                        args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
+                        memory.put((String) args[i], 0f);
+                    } else {
+                        args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
+                    }
                 } else {
                     args[i] = Float.parseFloat(tokens[i]);
                 }
@@ -57,7 +61,28 @@ public class Parser {
             }
             if (tokens[i].equals("repeat")) {
 //                node.repetitions = Integer.parseInt(tokens[i + 1]);
-                args[7] =  String.format("g%d", tokens[i + 1].charAt(1) - '0');
+                try {
+                    args[7] =  Integer.parseInt(tokens[i + 1]);
+                } catch (Exception exception) {
+                    if(tokens[i + 1].startsWith(".")) {
+                        int parentPath = StringTools.extractParentPath(tokens[i + 1]);
+
+                        int slot = parentPath % 10;
+                        int parentLevel = parentPath / 10;
+
+                        Node curr = new Node(node);
+                        for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
+
+                        args[7] = String.format("a%d", curr.id * 10 + slot);
+                        memory.put((String) args[i], 0f);
+                    } else {
+                        if (tokens[i + 1].startsWith("%%")) {
+                            args[7] = String.format("gg%d", tokens[i + 1].charAt(2) - '0');
+                        }else {
+                            args[7] = String.format("g%d", tokens[i + 1].charAt(1) - '0');
+                        }
+                    }
+                }
             }
         }
 
