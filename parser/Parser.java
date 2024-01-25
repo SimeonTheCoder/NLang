@@ -1,5 +1,6 @@
 package parser;
 
+import data.DataEnums;
 import data.ObjType;
 import data.OpCode;
 import nodes.Node;
@@ -19,6 +20,7 @@ public class Parser {
         Object[] args = new Object[10];
         args[0] = opCode.ordinal();
         args[8] = String.format("a%d", node.id * 10);
+        args[7] = 1;
         memory.put((String) args[8], 0f);
 
         for (int i = 1; i <= opCode.getArguments().length; i++) {
@@ -42,6 +44,8 @@ public class Parser {
                 }
             } else if (opCode.getArguments()[i - 1] == ObjType.FUNCTION) {
                 args[i] = functions.get(tokens[i]);
+            } else if (opCode.getArguments()[i - 1] == ObjType.ENUM) {
+                args[i] = DataEnums.valueOf(tokens[i].toUpperCase()).ordinal();
             }
         }
 
@@ -51,7 +55,10 @@ public class Parser {
                 args[8] = String.format("a%d", node.parentNode.id * 10 + --valSlot);
                 memory.put((String) args[8], 0f);
             }
-            if (tokens[i].equals("repeat")) node.repetitions = Integer.parseInt(tokens[i + 1]);
+            if (tokens[i].equals("repeat")) {
+//                node.repetitions = Integer.parseInt(tokens[i + 1]);
+                args[7] =  String.format("g%d", tokens[i + 1].charAt(1) - '0');
+            }
         }
 
         return args;

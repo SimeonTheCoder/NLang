@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Interpreter {
     public static void interpret(Node node, HashMap<String, Float> memory) {
         if (node.instruction != null) {
-            for(int l = 0; l < node.repetitions; l ++) executeInstruction(node.instruction, memory);
+            executeInstruction(node.instruction, memory);
             if(node.childNodes.size() > 0) {
                 for (Node childNode : node.childNodes) interpret(childNode, memory);
             }
@@ -23,145 +23,258 @@ public class Interpreter {
     public static void executeInstruction(Object[] instruction, HashMap<String, Float> memory) {
         int opCode = (Integer) instruction[0];
 
-        switch (opCode) {
-            //ADD
-            case 0: {
-                float valA;
+        int repetitions = 0;
 
-                try {
-                    valA = (Float) instruction[1];
-                } catch (Exception exception) {
-                    valA = memory.get((String) instruction[1]);
+        try {
+            repetitions = (Integer) instruction[7];
+        } catch (Exception exception) {
+            repetitions = Math.round(memory.get((String) instruction[7]));
+        }
+
+        for(int l = 0; l < repetitions; l++) {
+            switch (opCode) {
+                //ADD
+                case 0: {
+                    float valA;
+
+                    try {
+                        valA = (Float) instruction[1];
+                    } catch (Exception exception) {
+                        valA = memory.get((String) instruction[1]);
+                    }
+
+                    float valB;
+
+                    try {
+                        valB = (Float) instruction[2];
+                    } catch (Exception exception) {
+                        valB = memory.get((String) instruction[2]);
+                    }
+
+                    float result = valA + valB;
+                    memory.put((String) instruction[8], result);
+
+                    break;
                 }
 
-                float valB;
+                //SUB
+                case 1: {
+                    float valA;
 
-                try {
-                    valB = (Float) instruction[2];
-                } catch (Exception exception) {
-                    valB = memory.get((String) instruction[2]);
+                    try {
+                        valA = (Float) instruction[1];
+                    } catch (Exception exception) {
+                        valA = memory.get((String) instruction[1]);
+                    }
+
+                    float valB;
+
+                    try {
+                        valB = (Float) instruction[2];
+                    } catch (Exception exception) {
+                        valB = memory.get((String) instruction[2]);
+                    }
+
+                    float result = valA - valB;
+                    memory.put((String) instruction[8], result);
+
+                    break;
                 }
 
-                float result = valA + valB;
-                memory.put((String) instruction[8], result);
+                //MUL
+                case 2: {
+                    float valA;
 
-                break;
-            }
+                    try {
+                        valA = (Float) instruction[1];
+                    } catch (Exception exception) {
+                        valA = memory.get((String) instruction[1]);
+                    }
 
-            //SUB
-            case 1: {
-                float valA;
+                    float valB;
 
-                try {
-                    valA = (Float) instruction[1];
-                } catch (Exception exception) {
-                    valA = memory.get((String) instruction[1]);
+                    try {
+                        valB = (Float) instruction[2];
+                    } catch (Exception exception) {
+                        valB = memory.get((String) instruction[2]);
+                    }
+
+                    float result = valA * valB;
+                    memory.put((String) instruction[8], result);
+
+                    break;
                 }
 
-                float valB;
+                //DIV
+                case 3: {
+                    float valA;
 
-                try {
-                    valB = (Float) instruction[2];
-                } catch (Exception exception) {
-                    valB = memory.get((String) instruction[2]);
+                    try {
+                        valA = (Float) instruction[1];
+                    } catch (Exception exception) {
+                        valA = memory.get((String) instruction[1]);
+                    }
+
+                    float valB;
+
+                    try {
+                        valB = (Float) instruction[2];
+                    } catch (Exception exception) {
+                        valB = memory.get((String) instruction[2]);
+                    }
+
+                    float result = valA / valB;
+                    memory.put((String) instruction[8], result);
+
+                    break;
                 }
 
-                float result = valA - valB;
-                memory.put((String) instruction[8], result);
+                case 4: {
+                    float val;
 
-                break;
-            }
+                    try {
+                        val = (Float) instruction[2];
+                    } catch (Exception exception) {
+                        val = memory.get((String) instruction[2]);
+                    }
 
-            //MUL
-            case 2: {
-                float valA;
+                    memory.put((String) instruction[1], val);
 
-                try {
-                    valA = (Float) instruction[1];
-                } catch (Exception exception) {
-                    valA = memory.get((String) instruction[1]);
+                    break;
                 }
 
-                float valB;
+                //PRINT
+                case 5: {
+                    float val;
 
-                try {
-                    valB = (Float) instruction[2];
-                } catch (Exception exception) {
-                    valB = memory.get((String) instruction[2]);
+                    try {
+                        val = (Float) instruction[1];
+                    } catch (Exception exception) {
+                        val = memory.get((String) instruction[1]);
+                    }
+
+                    if (val == Math.round(val)) {
+                        System.out.print((int) val);
+                    } else {
+                        System.out.print(val);
+                    }
+
+                    break;
                 }
 
-                float result = valA * valB;
-                memory.put((String) instruction[8], result);
+                case 6: {
+                    Scanner scanner = new Scanner(System.in);
 
-                break;
-            }
+                    float val = Float.parseFloat(scanner.nextLine());
 
-            //DIV
-            case 3: {
-                float valA;
+                    memory.put((String) instruction[8], val);
 
-                try {
-                    valA = (Float) instruction[1];
-                } catch (Exception exception) {
-                    valA = memory.get((String) instruction[1]);
+                    break;
                 }
 
-                float valB;
+                case 7: {
+                    interpret((Node) instruction[1], memory);
 
-                try {
-                    valB = (Float) instruction[2];
-                } catch (Exception exception) {
-                    valB = memory.get((String) instruction[2]);
+                    break;
                 }
 
-                float result = valA / valB;
-                memory.put((String) instruction[8], result);
+                case 8: {
+                    float valA;
 
-                break;
-            }
+                    try {
+                        valA = (Float) instruction[1];
+                    } catch (Exception exception) {
+                        valA = memory.get((String) instruction[1]);
+                    }
 
-            case 4: {
-                float val;
+                    float valB;
 
-                try {
-                    val = (Float) instruction[2];
-                } catch (Exception exception) {
-                    val = memory.get((String) instruction[2]);
+                    try {
+                        valB = (Float) instruction[2];
+                    } catch (Exception exception) {
+                        valB = memory.get((String) instruction[2]);
+                    }
+
+                    switch ((Integer) instruction[3]) {
+                        case 0:
+                            if (valA == valB) {
+                                interpret((Node) instruction[4], memory);
+                            } else {
+                                interpret((Node) instruction[5], memory);
+                            }
+
+                            break;
+
+                        case 1:
+                            if (valA > valB) {
+                                interpret((Node) instruction[4], memory);
+                            } else {
+                                interpret((Node) instruction[5], memory);
+                            }
+
+                            break;
+
+                        case 2:
+                            if (valA < valB) {
+                                interpret((Node) instruction[4], memory);
+                            } else {
+                                interpret((Node) instruction[5], memory);
+                            }
+
+                            break;
+
+                        case 3:
+                            if (valA >= valB) {
+                                interpret((Node) instruction[4], memory);
+                            } else {
+                                interpret((Node) instruction[5], memory);
+                            }
+
+                            break;
+
+                        case 4:
+                            if (valA <= valB) {
+                                interpret((Node) instruction[4], memory);
+                            } else {
+                                interpret((Node) instruction[5], memory);
+                            }
+
+                            break;
+
+                        case 5:
+                            if (valA != valB) {
+                                interpret((Node) instruction[4], memory);
+                            } else {
+                                interpret((Node) instruction[5], memory);
+                            }
+
+                            break;
+                    }
+
+                    float result = valA + valB;
+                    memory.put((String) instruction[8], result);
+
+                    break;
                 }
 
-                memory.put((String) instruction[1], val);
+                //PRINTLN
+                case 9: {
+                    float val;
 
-                break;
-            }
+                    try {
+                        val = (Float) instruction[1];
+                    } catch (Exception exception) {
+                        val = memory.get((String) instruction[1]);
+                    }
 
-            case 5: {
-                float val;
+                    if (val == Math.round(val)) {
+                        System.out.println((int) val);
+                    } else {
+                        System.out.println(val);
+                    };
 
-                try {
-                    val = (Float) instruction[1];
-                } catch (Exception exception) {
-                    val = memory.get((String) instruction[1]);
+                    break;
                 }
-
-                System.out.println(val);
-
-                break;
-            }
-
-            case 6: {
-                Scanner scanner = new Scanner(System.in);
-
-                float val = Float.parseFloat(scanner.nextLine());
-
-                memory.put((String) instruction[8], val);
-
-                break;
-            }
-
-            case 7: {
-                interpret((Node) instruction[1], memory);
-
-                break;
             }
         }
     }

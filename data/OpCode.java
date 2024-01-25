@@ -48,6 +48,20 @@ public enum OpCode {
         public ObjType[] getArguments() {
             return new ObjType[] {ObjType.FUNCTION};
         }
+    },
+    IF {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {
+                    ObjType.NUMBER, ObjType.NUMBER, ObjType.ENUM, ObjType.FUNCTION, ObjType.FUNCTION
+            };
+        }
+    },
+    PRINTLN {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.NUMBER};
+        }
     };
 
     public ObjType[] getArguments() {

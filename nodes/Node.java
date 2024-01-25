@@ -10,8 +10,6 @@ public class Node {
 
     public Object[] instruction;
 
-    public float[] slots;
-
     public int level;
     public int id;
     public int repetitions;
@@ -21,8 +19,6 @@ public class Node {
         this.childNodes = new ArrayList<>();
 
         this.repetitions = 1;
-
-        this.slots = new float[10];
     }
 
     public Node(Node copy) {
@@ -33,9 +29,6 @@ public class Node {
         this.level = copy.level;
 
         this.parentNode = copy.parentNode;
-
         this.repetitions = copy.repetitions;
-
-        this.slots = new float[10];
     }
 }
