@@ -62,6 +62,30 @@ public enum OpCode {
         public ObjType[] getArguments() {
             return new ObjType[] {ObjType.NUMBER};
         }
+    },
+    ALLOC {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.NUMBER};
+        }
+    },
+    WRITE {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.FILE, ObjType.NUMBER};
+        }
+    },
+    MKFILE {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.FILE};
+        }
+    },
+    CLOSE {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.FILE};
+        }
     };
 
     public ObjType[] getArguments() {

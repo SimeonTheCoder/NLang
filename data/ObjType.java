@@ -3,5 +3,6 @@ package data;
 public enum ObjType {
     NUMBER,
     FUNCTION,
-    ENUM
+    ENUM,
+    FILE
 }

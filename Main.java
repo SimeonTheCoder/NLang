@@ -4,13 +4,13 @@ import parser.Linker;
 import parser.Parser;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         HashMap<String, Float> memory = new HashMap<>();
 
         Node mainNode = Parser.parse(new File(args[0] + ".nlp"), memory);

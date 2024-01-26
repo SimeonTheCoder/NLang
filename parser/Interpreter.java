@@ -1,13 +1,18 @@
 package parser;
 
+import data.WritableFile;
 import nodes.Node;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Interpreter {
-    public static void interpret(Node node, HashMap<String, Float> memory) {
+    public static HashMap<String, WritableFile> files = new HashMap<>();
+
+    public static void interpret(Node node, HashMap<String, Float> memory) throws IOException {
         if (node.instruction != null) {
             executeInstruction(node.instruction, memory);
             if(node.childNodes.size() > 0) {
@@ -43,7 +48,7 @@ public class Interpreter {
         return val;
     }
 
-    public static void executeInstruction(Object[] instruction, HashMap<String, Float> memory) {
+    public static void executeInstruction(Object[] instruction, HashMap<String, Float> memory) throws IOException {
         int opCode = (Integer) instruction[0];
 
         int repetitions = 0;
@@ -227,6 +232,57 @@ public class Interpreter {
                     } else {
                         System.out.println(val);
                     };
+
+                    break;
+                }
+
+                //ALLOC
+                case 10: {
+                    float val = getValue(instruction[1], memory);
+
+                    for(int i = 1; i <= Math.round(val) + 1; i++) {
+                        String key = String.format("g%d", i);
+
+                        if(memory.containsKey(key)) continue;
+
+                        memory.put(key, 0f);
+                    }
+
+                    break;
+                }
+
+                //WRITE
+                case 11: {
+                    String filename = String.valueOf(instruction[1]);
+                    float val = getValue(instruction[2], memory);
+
+                    files.get(filename).content.append(val).append(System.lineSeparator());
+
+                    break;
+                }
+
+                //MKFILE
+                case 12: {
+                    String filename = String.valueOf(instruction[1]);
+
+                    files.put(
+                            filename,
+                            new WritableFile(
+                                    new File(filename)
+                            )
+                    );
+
+                    break;
+                }
+
+                //CLOSE
+                case 13: {
+                    String filename = String.valueOf(instruction[1]);
+
+                    FileWriter writer = new FileWriter(filename);
+
+                    writer.write(files.get(filename).content.toString());
+                    writer.close();
 
                     break;
                 }

@@ -1,14 +1,16 @@
 package parser;
 
 import data.DataEnums;
-import data.ObjType;
 import data.OpCode;
 import nodes.Node;
 import utils.StringTools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
 
 public class Parser {
     public static HashMap<String, Node> functions;
@@ -24,32 +26,47 @@ public class Parser {
         memory.put((String) args[8], 0f);
 
         for (int i = 1; i <= opCode.getArguments().length; i++) {
-            if (opCode.getArguments()[i - 1] == ObjType.NUMBER) {
-                if (tokens[i].startsWith(".")) {
-                    int parentPath = StringTools.extractParentPath(tokens[i]);
+            switch (opCode.getArguments()[i - 1]) {
+                case NUMBER: {
+                    if (tokens[i].startsWith(".")) {
+                        int parentPath = StringTools.extractParentPath(tokens[i]);
 
-                    int slot = parentPath % 10;
-                    int parentLevel = parentPath / 10;
+                        int slot = parentPath % 10;
+                        int parentLevel = parentPath / 10;
 
-                    Node curr = new Node(node);
-                    for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
+                        Node curr = new Node(node);
+                        for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
 
-                    args[i] = String.format("a%d", curr.id * 10 + slot);
-                    memory.put((String) args[i], 0f);
-                } else if (tokens[i].startsWith("%")) {
-                    if(tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
-                        args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
+                        args[i] = String.format("a%d", curr.id * 10 + slot);
                         memory.put((String) args[i], 0f);
+                    } else if (tokens[i].startsWith("%")) {
+                        if(tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
+                            args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
+                            memory.put((String) args[i], 0f);
+                        } else {
+                            args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
+                        }
                     } else {
-                        args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
+                        args[i] = Float.parseFloat(tokens[i]);
                     }
-                } else {
-                    args[i] = Float.parseFloat(tokens[i]);
+
+                    break;
                 }
-            } else if (opCode.getArguments()[i - 1] == ObjType.FUNCTION) {
-                args[i] = functions.get(tokens[i]);
-            } else if (opCode.getArguments()[i - 1] == ObjType.ENUM) {
-                args[i] = DataEnums.valueOf(tokens[i].toUpperCase()).ordinal();
+
+                case FUNCTION: {
+                    args[i] = functions.get(tokens[i]);
+                    break;
+                }
+
+                case ENUM: {
+                    args[i] = DataEnums.valueOf(tokens[i].toUpperCase()).ordinal();
+                    break;
+                }
+
+                case FILE: {
+                    args[i] = tokens[i];
+                    break;
+                }
             }
         }
 
