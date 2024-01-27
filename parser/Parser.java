@@ -24,7 +24,7 @@ public class Parser {
         args[0] = opCode.ordinal();
         args[8] = String.format("a%d", node.id * 10);
         args[7] = 1;
-        memory.put((String) args[8], 0f);
+        if(!memory.containsKey((String) args[8])) memory.put((String) args[8], 0f);
 
         boolean multiple = false;
 
@@ -46,11 +46,11 @@ public class Parser {
                             for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
 
                             args[i] = String.format("a%d", curr.id * 10 + slot);
-                            memory.put((String) args[i], 0f);
+                            if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
                         } else if (tokens[i].startsWith("%")) {
                             if (tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
                                 args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
-                                memory.put((String) args[i], 0f);
+                                if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
                             } else {
                                 args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
                             }
@@ -89,11 +89,11 @@ public class Parser {
                     for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
 
                     args[i] = String.format("a%d", curr.id * 10 + slot);
-                    memory.put((String) args[i], 0f);
+                    if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
                 } else if (tokens[i].startsWith("%")) {
                     if(tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
                         args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
-                        memory.put((String) args[i], 0f);
+                        if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
                     } else {
                         args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
                     }
