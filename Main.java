@@ -40,7 +40,18 @@ public class Main {
             String line = scanner.nextLine();
 
             while(!line.equals("exit")) {
-                if(!line.equals("memdump")) {
+                if(line.chars().allMatch( Character::isDigit )) {
+                    Node node = new Node();
+                    node.id = nodeId++;
+
+                    if(nodes.size() > 0) {
+                        node.parentNode = nodes.get(nodes.size() - 1);
+                    }
+
+                    nodes.add(node);
+
+                    memory.put(String.format("a%d", (nodeId - 1) * 10), Float.parseFloat(line));
+                } else if(!line.equals("memdump")) {
                     Node node = new Node();
                     node.id = nodeId++;
 
