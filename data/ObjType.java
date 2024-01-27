@@ -4,5 +4,6 @@ public enum ObjType {
     NUMBER,
     FUNCTION,
     ENUM,
-    FILE
+    STRING,
+    MULTIPLE
 }

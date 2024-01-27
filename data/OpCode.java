@@ -72,19 +72,37 @@ public enum OpCode {
     WRITE {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.FILE, ObjType.NUMBER};
+            return new ObjType[] {ObjType.STRING, ObjType.NUMBER};
         }
     },
     MKFILE {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.FILE};
+            return new ObjType[] {ObjType.STRING};
         }
     },
     CLOSE {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.FILE};
+            return new ObjType[] {ObjType.STRING};
+        }
+    },
+    OPEN {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.STRING};
+        }
+    },
+    READLINE {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.STRING, ObjType.ENUM};
+        }
+    },
+    IMPORT {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.STRING, ObjType.STRING, ObjType.MULTIPLE};
         }
     };
 

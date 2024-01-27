@@ -1,6 +1,7 @@
 package parser;
 
 import data.DataEnums;
+import data.ObjType;
 import data.OpCode;
 import nodes.Node;
 import utils.StringTools;
@@ -13,9 +14,9 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Parser {
-    public static HashMap<String, Node> functions;
+    public HashMap<String, Node> functions;
 
-    public static Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) {
+    public Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) {
         String[] tokens = instruction.split(" ");
         OpCode opCode = OpCode.valueOf(tokens[0].toUpperCase());
 
@@ -25,56 +26,99 @@ public class Parser {
         args[7] = 1;
         memory.put((String) args[8], 0f);
 
-        for (int i = 1; i <= opCode.getArguments().length; i++) {
-            switch (opCode.getArguments()[i - 1]) {
-                case NUMBER: {
-                    if (tokens[i].startsWith(".")) {
-                        int parentPath = StringTools.extractParentPath(tokens[i]);
+        boolean multiple = false;
 
-                        int slot = parentPath % 10;
-                        int parentLevel = parentPath / 10;
+        for (int i = 1; i <= 10; i++) {
+            if(i >= tokens.length) break;
+            if(!multiple && i > opCode.getArguments().length) break;
 
-                        Node curr = new Node(node);
-                        for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
+            if(!multiple) {
+                switch (opCode.getArguments()[i - 1]) {
+                    case NUMBER:
+                    case MULTIPLE: {
+                        if (tokens[i].startsWith(".")) {
+                            int parentPath = StringTools.extractParentPath(tokens[i]);
 
-                        args[i] = String.format("a%d", curr.id * 10 + slot);
-                        memory.put((String) args[i], 0f);
-                    } else if (tokens[i].startsWith("%")) {
-                        if(tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
-                            args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
+                            int slot = parentPath % 10;
+                            int parentLevel = parentPath / 10;
+
+                            Node curr = new Node(node);
+                            for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
+
+                            args[i] = String.format("a%d", curr.id * 10 + slot);
                             memory.put((String) args[i], 0f);
+                        } else if (tokens[i].startsWith("%")) {
+                            if (tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
+                                args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
+                                memory.put((String) args[i], 0f);
+                            } else {
+                                args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
+                            }
                         } else {
-                            args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
+                            args[i] = Float.parseFloat(tokens[i]);
                         }
-                    } else {
-                        args[i] = Float.parseFloat(tokens[i]);
+
+                        if (opCode.getArguments()[i - 1] == ObjType.MULTIPLE) multiple = true;
+
+                        break;
                     }
 
-                    break;
+                    case FUNCTION: {
+                        args[i] = functions.get(tokens[i]);
+                        break;
+                    }
+
+                    case ENUM: {
+                        args[i] = DataEnums.valueOf(tokens[i].toUpperCase()).ordinal();
+                        break;
+                    }
+
+                    case STRING: {
+                        args[i] = tokens[i];
+                        break;
+                    }
+                }
+            } else {
+                if (tokens[i].startsWith(".")) {
+                    int parentPath = StringTools.extractParentPath(tokens[i]);
+
+                    int slot = parentPath % 10;
+                    int parentLevel = parentPath / 10;
+
+                    Node curr = new Node(node);
+                    for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
+
+                    args[i] = String.format("a%d", curr.id * 10 + slot);
+                    memory.put((String) args[i], 0f);
+                } else if (tokens[i].startsWith("%")) {
+                    if(tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
+                        args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
+                        memory.put((String) args[i], 0f);
+                    } else {
+                        args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
+                    }
+                } else {
+                    args[i] = Float.parseFloat(tokens[i]);
                 }
 
-                case FUNCTION: {
-                    args[i] = functions.get(tokens[i]);
-                    break;
-                }
-
-                case ENUM: {
-                    args[i] = DataEnums.valueOf(tokens[i].toUpperCase()).ordinal();
-                    break;
-                }
-
-                case FILE: {
-                    args[i] = tokens[i];
-                    break;
-                }
+                break;
             }
         }
 
         for (int i = 0; i < tokens.length - 1; i++) {
             if (tokens[i].equals("as")) {
-                int valSlot = tokens[i + 1].charAt(1) - '0';
-                args[8] = String.format("a%d", node.parentNode.id * 10 + --valSlot);
-                memory.put((String) args[8], 0f);
+                if(tokens[i + 1].charAt(0) == '&') {
+                    int valSlot = tokens[i + 1].charAt(1) - '0';
+                    args[8] = String.format("a%d", node.parentNode.id * 10 + --valSlot);
+                    memory.put((String) args[8], 0f);
+                } else if (tokens[i + 1].charAt(0) == '%') {
+                    if(tokens[i + 1].charAt(1) >= '0' && tokens[i + 1].charAt(1) <= '9') {
+                        args[8] = String.format("g%d", tokens[i + 1].charAt(1) - '0');
+                        memory.put((String) args[i + 1], 0f);
+                    } else {
+                        args[8] = String.format("gg%d", tokens[i + 1].charAt(2) - '0');
+                    }
+                }
             }
             if (tokens[i].equals("repeat")) {
 //                node.repetitions = Integer.parseInt(tokens[i + 1]);
@@ -106,7 +150,7 @@ public class Parser {
         return args;
     }
 
-    public static Node parse(File file, HashMap<String, Float> memory) throws FileNotFoundException {
+    public Node parse(File file, HashMap<String, Float> memory) throws FileNotFoundException {
         Scanner scanner = new Scanner(file);
 
         List<String> lines = new ArrayList<>();
@@ -183,6 +227,7 @@ public class Parser {
             }
         }
 
+        if(nodes.size() == 0) return null;
         return nodes.get(0);
     }
 }

@@ -6,5 +6,6 @@ public enum DataEnums {
     LESS_THAN,
     GREATER_EQUAL,
     LESS_EQUAL,
-    NOT_EQUAL
+    NOT_EQUAL,
+    NUMBER
 }

@@ -13,9 +13,12 @@ public class Main {
     public static void main(String[] args) throws IOException {
         HashMap<String, Float> memory = new HashMap<>();
 
-        Node mainNode = Parser.parse(new File(args[0] + ".nlp"), memory);
+        Parser parser = new Parser();
+        Node mainNode = parser.parse(new File(args[0] + ".nlp"), memory);
 
-        Linker.linkArgs(
+        Linker linker = new Linker();
+
+        linker.linkArgs(
                 Arrays.stream(args).skip(1).map(
                         Float::parseFloat
                 ).collect(Collectors.toList()).toArray(new Float[]{}),
