@@ -2,12 +2,14 @@ package parser;
 
 import data.DataEnums;
 import data.ObjType;
-import data.OpCode;
 import nodes.Node;
+import operations.Operation;
+import utils.EnumUtils;
 import utils.StringTools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,12 +18,12 @@ import java.util.Scanner;
 public class Parser {
     public HashMap<String, Node> functions;
 
-    public Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) {
-        String[] tokens = instruction.split(" ");
-        OpCode opCode = OpCode.valueOf(tokens[0].toUpperCase());
+    public Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        String[] tokens = instruction.split("\\s+");
+        Operation operation = EnumUtils.getOperation(tokens[0].toUpperCase());
 
         Object[] args = new Object[10];
-        args[0] = opCode.ordinal();
+        args[0] = operation;
         args[8] = String.format("a%d", node.id * 10);
         args[7] = 1;
         if(!memory.containsKey((String) args[8])) memory.put((String) args[8], 0f);
@@ -30,10 +32,10 @@ public class Parser {
 
         for (int i = 1; i <= 10; i++) {
             if(i >= tokens.length) break;
-            if(!multiple && i > opCode.getArguments().length) break;
+            if(!multiple && i > operation.getArguments().length) break;
 
             if(!multiple) {
-                switch (opCode.getArguments()[i - 1]) {
+                switch (operation.getArguments()[i - 1]) {
                     case NUMBER:
                     case MULTIPLE: {
                         if (tokens[i].startsWith(".")) {
@@ -51,14 +53,16 @@ public class Parser {
                             if (tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
                                 args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
                                 if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
-                            } else {
+                            } else if (tokens[i].charAt(1) == '%') {
                                 args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
+                            } else {
+                                throw new IllegalArgumentException("Address " + tokens[i] + " doesn't exist");
                             }
                         } else {
                             args[i] = Float.parseFloat(tokens[i]);
                         }
 
-                        if (opCode.getArguments()[i - 1] == ObjType.MULTIPLE) multiple = true;
+                        if (operation.getArguments()[i - 1] == ObjType.MULTIPLE) multiple = true;
 
                         break;
                     }
@@ -150,7 +154,7 @@ public class Parser {
         return args;
     }
 
-    public Node parse(File file, HashMap<String, Float> memory) throws FileNotFoundException {
+    public Node parse(File file, HashMap<String, Float> memory) throws FileNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         Scanner scanner = new Scanner(file);
 
         List<String> lines = new ArrayList<>();

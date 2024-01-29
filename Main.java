@@ -2,78 +2,86 @@ import nodes.Node;
 import parser.Interpreter;
 import parser.Linker;
 import parser.Parser;
+import utils.EnumUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        if(args.length != 0) {
-            HashMap<String, Float> memory = new HashMap<>();
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        EnumUtils.initClass();
 
-            Parser parser = new Parser();
-            Node mainNode = parser.parse(new File(args[0] + ".nlp"), memory);
+        try {
+            if (args.length != 0) {
+                HashMap<String, Float> memory = new HashMap<>();
 
-            Linker linker = new Linker();
+                Parser parser = new Parser();
+                Node mainNode = parser.parse(new File(args[0] + ".nlp"), memory);
 
-            linker.linkArgs(
-                    Arrays.stream(args).skip(1).map(
-                            Float::parseFloat
-                    ).collect(Collectors.toList()).toArray(new Float[]{}),
-                    memory
-            );
+                Linker linker = new Linker();
 
-            Interpreter.interpret(mainNode, memory);
-        } else {
-            HashMap<String, Float> memory = new HashMap<>();
+                linker.linkArgs(
+                        Arrays.stream(args).skip(1).map(
+                                Float::parseFloat
+                        ).collect(Collectors.toList()).toArray(new Float[]{}),
+                        memory
+                );
 
-            Parser parser = new Parser();
+                Interpreter.interpret(mainNode, memory);
+            } else {
+                HashMap<String, Float> memory = new HashMap<>();
 
-            List<Node> nodes = new ArrayList<>();
-            int nodeId = 0;
+                Parser parser = new Parser();
 
-            Scanner scanner = new Scanner(System.in);
+                List<Node> nodes = new ArrayList<>();
+                int nodeId = 0;
 
-            System.out.print(">> ");
-            String line = scanner.nextLine();
-
-            while(!line.equals("exit")) {
-                if(line.chars().allMatch( Character::isDigit )) {
-                    Node node = new Node();
-                    node.id = nodeId++;
-
-                    if(nodes.size() > 0) {
-                        node.parentNode = nodes.get(nodes.size() - 1);
-                    }
-
-                    nodes.add(node);
-
-                    memory.put(String.format("a%d", (nodeId - 1) * 10), Float.parseFloat(line));
-                } else if(!line.equals("memdump")) {
-                    Node node = new Node();
-                    node.id = nodeId++;
-
-                    if(nodes.size() > 0) {
-                        node.parentNode = nodes.get(nodes.size() - 1);
-                    }
-
-                    nodes.add(node);
-
-                    Interpreter.executeInstruction(
-                            parser.parseInstruction(line, node, memory),
-                            memory
-                    );
-                } else {
-                    for (Map.Entry<String, Float> entry : memory.entrySet()) {
-                        System.out.println(entry.getKey() + " -> " + entry.getValue());
-                    }
-                }
+                Scanner scanner = new Scanner(System.in);
 
                 System.out.print(">> ");
-                line = scanner.nextLine();
+                String line = scanner.nextLine();
+
+                while (!line.equals("exit")) {
+                    if (line.chars().allMatch(Character::isDigit)) {
+                        Node node = new Node();
+                        node.id = nodeId++;
+
+                        if (nodes.size() > 0) {
+                            node.parentNode = nodes.get(nodes.size() - 1);
+                        }
+
+                        nodes.add(node);
+
+                        memory.put(String.format("a%d", (nodeId - 1) * 10), Float.parseFloat(line));
+                    } else if (!line.equals("memdump")) {
+                        Node node = new Node();
+                        node.id = nodeId++;
+
+                        if (nodes.size() > 0) {
+                            node.parentNode = nodes.get(nodes.size() - 1);
+                        }
+
+                        nodes.add(node);
+
+                        Interpreter.executeInstruction(
+                                parser.parseInstruction(line, node, memory),
+                                memory
+                        );
+                    } else {
+                        for (Map.Entry<String, Float> entry : memory.entrySet()) {
+                            System.out.println(entry.getKey() + " -> " + entry.getValue());
+                        }
+                    }
+
+                    System.out.print(">> ");
+                    line = scanner.nextLine();
+                }
             }
+        } catch(Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 }
