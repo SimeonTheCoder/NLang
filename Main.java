@@ -94,7 +94,7 @@ public class Main {
                             File file = new File("CustomOperation.java");
                             FileWriter fileWriter = new FileWriter(file);
 
-                            fileWriter.write("import data.ObjType;\n" +
+                            fileWriter.write("package build;\nimport data.ObjType;\n" +
                                     "import data.ReadableFile;\n" +
                                     "import data.WritableFile;\n" +
                                     "import operations.Operation;\n" +
