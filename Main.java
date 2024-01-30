@@ -90,7 +90,7 @@ public class Main {
                             break;
                         }
 
-                        case "--init":
+                        case "--init": {
                             File file = new File("CustomOperation.java");
                             FileWriter fileWriter = new FileWriter(file);
 
@@ -132,6 +132,21 @@ public class Main {
                             fileWriter.close();
 
                             break;
+                        }
+
+                        case "--get": {
+                            String repo = String.format(
+                                    "https://raw.githubusercontent.com/%s/%s/main/CustomOperation.java",
+                                    args[1],
+                                    args[2]
+                            );
+
+                            System.out.println(repo);
+
+                            Runtime.getRuntime().exec("curl -o CustomOperation.java "+ repo);
+
+                            break;
+                        }
                     }
                 } else {
                     EnumUtils.initClass();
