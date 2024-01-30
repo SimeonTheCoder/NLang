@@ -7,7 +7,10 @@ import utils.EnumUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -15,7 +18,7 @@ public class Main {
         EnumUtils.initClass();
 
         try {
-            if (args.length != 0) {
+            if (args.length != 0 && !args[0].startsWith("--")) {
                 HashMap<String, Float> memory = new HashMap<>();
 
                 Parser parser = new Parser();
@@ -32,52 +35,107 @@ public class Main {
 
                 Interpreter.interpret(mainNode, memory);
             } else {
-                HashMap<String, Float> memory = new HashMap<>();
+                if(args.length != 0 && args[0].startsWith("--")) {
+                    switch(args[0]) {
+                        case "--build":
+                            File dir = new File("build");
+                            dir.mkdir();
 
-                Parser parser = new Parser();
+                            System.out.println("Directory created!");
 
-                List<Node> nodes = new ArrayList<>();
-                int nodeId = 0;
+                            Runtime.getRuntime().exec("git clone https://github.com/SimeonTheCoder/NLang build");
+                            TimeUnit.SECONDS.sleep(2);
 
-                Scanner scanner = new Scanner(System.in);
+                            System.out.println("Repository cloned!");
 
-                System.out.print(">> ");
-                String line = scanner.nextLine();
+                            String path = System.getenv("JAVA_HOME") + "\\bin" + "\\javac ";
 
-                while (!line.equals("exit")) {
-                    if (line.chars().allMatch(Character::isDigit)) {
-                        Node node = new Node();
-                        node.id = nodeId++;
+                            Files.copy(
+                                    new File("CustomOperation.java").toPath(),
+                                    new File("./build/CustomOperation.java").toPath(),
+                                    StandardCopyOption.REPLACE_EXISTING
+                            );
 
-                        if (nodes.size() > 0) {
-                            node.parentNode = nodes.get(nodes.size() - 1);
-                        }
+                            System.out.println("File copied!");
 
-                        nodes.add(node);
+                            ProcessBuilder builder = new ProcessBuilder((path + "CustomOperation.java").split("\\s+"));
+                            builder.directory(dir);
 
-                        memory.put(String.format("a%d", (nodeId - 1) * 10), Float.parseFloat(line));
-                    } else if (!line.equals("memdump")) {
-                        Node node = new Node();
-                        node.id = nodeId++;
+                            builder.start();
 
-                        if (nodes.size() > 0) {
-                            node.parentNode = nodes.get(nodes.size() - 1);
-                        }
+                            System.out.println(path + "CustomOperation.java");
 
-                        nodes.add(node);
+                            TimeUnit.SECONDS.sleep(2);
 
-                        Interpreter.executeInstruction(
-                                parser.parseInstruction(line, node, memory),
-                                memory
-                        );
-                    } else {
-                        for (Map.Entry<String, Float> entry : memory.entrySet()) {
-                            System.out.println(entry.getKey() + " -> " + entry.getValue());
-                        }
+                            System.out.println("Class compiled!");
+
+                            for (File file : Objects.requireNonNull(dir.listFiles())) {
+                                if(!file.getName().endsWith(".class") && file.getName().contains(".")) {
+                                    file.delete();
+                                } else if(!file.getName().contains(".")) {
+                                    String[] entries = file.list();
+
+                                    for(String currPath: entries){
+                                        File currentFile = new File(file.getPath(), currPath);
+                                        currentFile.delete();
+                                    }
+
+                                    file.delete();
+                                }
+                            }
+
+                            System.out.println("Junk deleted!");
+
+                            break;
                     }
+                } else {
+                    HashMap<String, Float> memory = new HashMap<>();
+
+                    Parser parser = new Parser();
+
+                    List<Node> nodes = new ArrayList<>();
+                    int nodeId = 0;
+
+                    Scanner scanner = new Scanner(System.in);
 
                     System.out.print(">> ");
-                    line = scanner.nextLine();
+                    String line = scanner.nextLine();
+
+                    while (!line.equals("exit")) {
+                        if (line.chars().allMatch(Character::isDigit)) {
+                            Node node = new Node();
+                            node.id = nodeId++;
+
+                            if (nodes.size() > 0) {
+                                node.parentNode = nodes.get(nodes.size() - 1);
+                            }
+
+                            nodes.add(node);
+
+                            memory.put(String.format("a%d", (nodeId - 1) * 10), Float.parseFloat(line));
+                        } else if (!line.equals("memdump")) {
+                            Node node = new Node();
+                            node.id = nodeId++;
+
+                            if (nodes.size() > 0) {
+                                node.parentNode = nodes.get(nodes.size() - 1);
+                            }
+
+                            nodes.add(node);
+
+                            Interpreter.executeInstruction(
+                                    parser.parseInstruction(line, node, memory),
+                                    memory
+                            );
+                        } else {
+                            for (Map.Entry<String, Float> entry : memory.entrySet()) {
+                                System.out.println(entry.getKey() + " -> " + entry.getValue());
+                            }
+                        }
+
+                        System.out.print(">> ");
+                        line = scanner.nextLine();
+                    }
                 }
             }
         } catch(Exception e) {

@@ -18,7 +18,9 @@ public class ExecutorThread extends Thread {
     public void run() {
         for(int i = 0; i < queue.size(); i++) {
             try {
-                Interpreter.executeInstruction(queue.get(i), memory);
+                if(queue.containsKey(i)) {
+                    Interpreter.executeInstruction(queue.get(i), memory);
+                }
             } catch (IOException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
                      InstantiationException e) {
                 throw new RuntimeException(e);

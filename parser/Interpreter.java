@@ -2,6 +2,7 @@ package parser;
 
 import data.ReadableFile;
 import data.WritableFile;
+import executor.ThreadManager;
 import nodes.Node;
 import operations.Operation;
 
@@ -12,6 +13,29 @@ import java.util.HashMap;
 public class Interpreter {
     public static HashMap<String, WritableFile> writableFiles = new HashMap<>();
     public static HashMap<String, ReadableFile> readableFiles = new HashMap<>();
+
+    public static ThreadManager threadManager;
+
+    public static void interpretMain(Node node, HashMap<String, Float> memory, int operationIndex, int threadIndex) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        if (operationIndex == 0) threadManager = new ThreadManager(8, memory);
+
+        if (node.instruction != null) {
+            threadManager.enqueue(node.instruction, threadIndex, operationIndex);
+//            executeInstruction(node.instruction, memory);
+            if (node.childNodes.size() > 0) {
+                for (Node childNode : node.childNodes) interpretMain(childNode, memory, operationIndex++, threadIndex);
+            }
+        } else {
+            for (int l = 0; l < node.repetitions; l++) {
+                for (Node parallelNode : node.parallelNodes) interpretMain(parallelNode, memory, operationIndex, threadIndex + 1);
+                for (Node childNode : node.childNodes) interpretMain(childNode, memory, operationIndex, threadIndex + 1);
+            }
+        }
+
+        if (operationIndex == 0) {
+            threadManager.startAll();
+        }
+    }
 
     public static void interpret(Node node, HashMap<String, Float> memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         if (node.instruction != null) {
