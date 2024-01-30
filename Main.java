@@ -5,6 +5,7 @@ import parser.Parser;
 import utils.EnumUtils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -15,10 +16,10 @@ import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        EnumUtils.initClass();
-
         try {
             if (args.length != 0 && !args[0].startsWith("--")) {
+                EnumUtils.initClass();
+
                 HashMap<String, Float> memory = new HashMap<>();
 
                 Parser parser = new Parser();
@@ -37,7 +38,7 @@ public class Main {
             } else {
                 if(args.length != 0 && args[0].startsWith("--")) {
                     switch(args[0]) {
-                        case "--build":
+                        case "--build": {
                             File dir = new File("build");
                             dir.mkdir();
 
@@ -70,12 +71,12 @@ public class Main {
                             System.out.println("Class compiled!");
 
                             for (File file : Objects.requireNonNull(dir.listFiles())) {
-                                if(!file.getName().endsWith(".class") && file.getName().contains(".")) {
+                                if (!file.getName().endsWith(".class") && file.getName().contains(".")) {
                                     file.delete();
-                                } else if(!file.getName().contains(".")) {
+                                } else if (!file.getName().contains(".")) {
                                     String[] entries = file.list();
 
-                                    for(String currPath: entries){
+                                    for (String currPath : entries) {
                                         File currentFile = new File(file.getPath(), currPath);
                                         currentFile.delete();
                                     }
@@ -87,8 +88,54 @@ public class Main {
                             System.out.println("Junk deleted!");
 
                             break;
+                        }
+
+                        case "--init":
+                            File file = new File("CustomOperation.java");
+                            FileWriter fileWriter = new FileWriter(file);
+
+                            fileWriter.write("import data.ObjType;\n" +
+                                    "import data.ReadableFile;\n" +
+                                    "import data.WritableFile;\n" +
+                                    "import operations.Operation;\n" +
+                                    "\n" +
+                                    "import java.io.IOException;\n" +
+                                    "import java.util.HashMap;\n" +
+                                    "\n" +
+                                    "public enum CustomOperation implements Operation {\n" +
+                                    "    PING {\n" +
+                                    "        @Override\n" +
+                                    "        public ObjType[] getArguments() {\n" +
+                                    "            return new ObjType[]{};\n" +
+                                    "        }\n" +
+                                    "\n" +
+                                    "        @Override\n" +
+                                    "        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {\n" +
+                                    "            System.out.println(\"Pong!\");\n" +
+                                    "        }\n" +
+                                    "    };\n" +
+                                    "\n" +
+                                    "    public CustomOperation value(String str) {\n" +
+                                    "        switch (str) {\n" +
+                                    "            case \"PING\":\n" +
+                                    "                return PING;\n" +
+                                    "\n" +
+                                    "            default:\n" +
+                                    "                return null;\n" +
+                                    "        }\n" +
+                                    "    }\n" +
+                                    "\n" +
+                                    "    CustomOperation() {\n" +
+                                    "    }\n" +
+                                    "}");
+
+                            fileWriter.close();
+
+                            break;
                     }
                 } else {
+                    EnumUtils.initClass();
+
                     HashMap<String, Float> memory = new HashMap<>();
 
                     Parser parser = new Parser();
