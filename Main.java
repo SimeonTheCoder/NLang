@@ -39,7 +39,7 @@ public class Main {
                 if(args.length != 0 && args[0].startsWith("--")) {
                     switch(args[0]) {
                         case "--build": {
-                            File dir = new File("build");
+                            File dir = new File(System.getProperty("user.dir") + "\\" + "build");
                             dir.mkdir();
 
                             System.out.println("Directory created!");
@@ -59,33 +59,7 @@ public class Main {
 
                             System.out.println("File copied!");
 
-                            ProcessBuilder builder = new ProcessBuilder((path + "CustomOperation.java").split("\\s+"));
-                            builder.directory(dir);
-
-                            builder.start();
-
-                            System.out.println(path + "CustomOperation.java");
-
-                            TimeUnit.SECONDS.sleep(2);
-
-                            System.out.println("Class compiled!");
-
-                            for (File file : Objects.requireNonNull(dir.listFiles())) {
-                                if (!file.getName().endsWith(".class") && file.getName().contains(".")) {
-                                    file.delete();
-                                } else if (!file.getName().contains(".")) {
-                                    String[] entries = file.list();
-
-                                    for (String currPath : entries) {
-                                        File currentFile = new File(file.getPath(), currPath);
-                                        currentFile.delete();
-                                    }
-
-                                    file.delete();
-                                }
-                            }
-
-                            System.out.println("Junk deleted!");
+                            Runtime.getRuntime().exec("cmd.exe /c \"start build.bat\"");
 
                             break;
                         }
