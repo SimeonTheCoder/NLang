@@ -1,0 +1,15 @@
+func process (
+	div %1 500
+		mul %1 .
+			sub 1000 .
+				set %1 .
+)
+
+func process2 (
+	div %1 50
+		sin .
+			mul . 200
+				mul . %2
+					sub 500 .
+						set %1 .
+)
