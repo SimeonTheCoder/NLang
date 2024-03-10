@@ -269,7 +269,7 @@ public enum BasicOperation implements Operation{
             String filename = String.valueOf(instruction[1]);
             float val = Interpreter.getValue(instruction[2], memory);
 
-            if(!writableFiles.containsKey(filename)) throw new IllegalArgumentException("File " + filename + " isn't open");
+//            if(!writableFiles.containsKey(filename)) throw new IllegalArgumentException("File " + filename + " isn't open");
 
             writableFiles.get(filename).content.append(val).append(System.lineSeparator());
         }

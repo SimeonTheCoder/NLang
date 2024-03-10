@@ -78,12 +78,17 @@ public class Interpreter {
     }
 
     public static void executeInstruction(Object[] instruction, HashMap<String, Float> memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        int repetitions;
+        int repetitions = 1;
 
         try {
             repetitions = (Integer) instruction[7];
         } catch (Exception exception) {
-            repetitions = Math.round(memory.get((String) instruction[7]));
+            try {
+                repetitions = Math.round(memory.get(String.valueOf(instruction[7])));
+            } catch (Exception exception2) {
+//                System.out.println(instruction.length);
+                return;
+            }
         }
 
         for (int l = 0; l < repetitions; l++) {

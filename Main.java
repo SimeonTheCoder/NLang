@@ -1,3 +1,4 @@
+import executor.ThreadManager;
 import nodes.Node;
 import parser.Interpreter;
 import parser.Linker;
@@ -6,8 +7,6 @@ import utils.EnumUtils;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static void main(String[] args) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) {
         try {
             if (args.length != 0 && !args[0].startsWith("--")) {
                 EnumUtils.initClass();
@@ -34,7 +33,29 @@ public class Main {
                         memory
                 );
 
-                Interpreter.interpret(mainNode, memory);
+                ThreadManager threadManager = new ThreadManager(8, memory);
+                threadManager.enqueueNode(mainNode, 0, 0);
+
+                double start = System.currentTimeMillis();
+
+                threadManager.startAll();
+
+                boolean working = true;
+
+                while (working) {
+                    working = false;
+
+                    for(int i = 0; i < threadManager.threads.length; i++) {
+                        if(threadManager.threads[i].isAlive()) {
+                            working = true;
+                        }
+                    }
+                }
+
+                double end = System.currentTimeMillis();
+
+                System.out.println(end - start);
+//                Interpreter.interpret(mainNode, memory);
             } else {
                 if(args.length != 0 && args[0].startsWith("--")) {
                     switch(args[0]) {

@@ -17,6 +17,7 @@ import java.util.Scanner;
 
 public class Parser {
     public HashMap<String, Node> functions;
+    private HashMap<String, String> aliases;
 
     public Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         String[] tokens = instruction.split("\\s+");
@@ -38,6 +39,10 @@ public class Parser {
                 switch (operation.getArguments()[i - 1]) {
                     case NUMBER:
                     case MULTIPLE: {
+                        if (aliases.containsKey(tokens[i])) {
+                            tokens[i] = aliases.get(tokens[i]);
+                        }
+
                         if (tokens[i].startsWith(".")) {
                             int parentPath = StringTools.extractParentPath(tokens[i]);
 
@@ -111,6 +116,10 @@ public class Parser {
 
         for (int i = 0; i < tokens.length - 1; i++) {
             if (tokens[i].equals("as")) {
+                if(aliases.containsKey(tokens[i + 1])) {
+                    tokens[i + 1] = aliases.get(tokens[i + 1]);
+                }
+
                 if(tokens[i + 1].charAt(0) == '&') {
                     int valSlot = tokens[i + 1].charAt(1) - '0';
                     args[8] = String.format("a%d", node.parentNode.id * 10 + --valSlot);
@@ -159,6 +168,7 @@ public class Parser {
 
         List<String> lines = new ArrayList<>();
         functions = new HashMap<>();
+        aliases = new HashMap<>();
 
         while (scanner.hasNextLine()) lines.add(scanner.nextLine());
 
@@ -170,6 +180,11 @@ public class Parser {
         for (int level = 0; level < 64; level++) {
             for (int currLine = 0; currLine < lines.size(); currLine++) {
                 if(lines.get(currLine).trim().isEmpty()) continue;
+
+                if(lines.get(currLine).startsWith("alias")) {
+                    aliases.put(lines.get(currLine).split(" ")[3], lines.get(currLine).split(" ")[1]);
+                    continue;
+                }
 
                 if (StringTools.indentation(lines.get(currLine)) == level) {
                     Node node = new Node();
@@ -188,7 +203,7 @@ public class Parser {
                             if (StringTools.indentation(lines.get(pointer)) == level) {
                                 for (int i = currLine; i <= pointer; i++) nodeMap[i] = node;
 
-                                node.level = level;
+                                node.level = level + (func ? 0 : 4);
                                 if (level != 0) node.parentNode = nodeMap[currLine - 1];
 
                                 node.id = currId++;
