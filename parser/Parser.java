@@ -42,7 +42,7 @@ public class Parser {
         for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
 
         String address = String.format("a%d", curr.id * 10 + slot);
-        memory.put(address, 0f);
+        if(!memory.containsKey(address)) memory.put(address, 0f);
 
         return address;
     }
