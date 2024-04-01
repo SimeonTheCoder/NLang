@@ -19,6 +19,34 @@ public class Parser {
     public HashMap<String, Node> functions;
     private HashMap<String, String> aliases;
 
+    public String extractGlobalAddress(String data, HashMap<String, Float> memory) {
+        if(data.charAt(1) >= '0' && data.charAt(1) <= '9') {
+            String address = String.format("g%s", data.substring(1));
+            if(!memory.containsKey((String) address)) memory.put((String) address, 0f);
+
+            return address;
+        } else if (data.charAt(1) == '%') {
+            return String.format("gg%s", data.substring(2));
+        } else {
+            throw new IllegalArgumentException("Address " + data + " doesn't exist");
+        }
+    }
+
+    public String extractLocalAddress(String data, Node node, HashMap<String, Float> memory) {
+        int parentPath = StringTools.extractParentPath(data);
+
+        int slot = parentPath % 10;
+        int parentLevel = parentPath / 10;
+
+        Node curr = new Node(node);
+        for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
+
+        String address = String.format("a%d", curr.id * 10 + slot);
+        memory.put(address, 0f);
+
+        return address;
+    }
+
     public Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         String[] tokens = instruction.split("\\s+");
         Operation operation = EnumUtils.getOperation(tokens[0].toUpperCase());
@@ -44,25 +72,9 @@ public class Parser {
                         }
 
                         if (tokens[i].startsWith(".")) {
-                            int parentPath = StringTools.extractParentPath(tokens[i]);
-
-                            int slot = parentPath % 10;
-                            int parentLevel = parentPath / 10;
-
-                            Node curr = new Node(node);
-                            for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
-
-                            args[i] = String.format("a%d", curr.id * 10 + slot);
-                            if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
+                            args[i] = extractLocalAddress(tokens[i], node, memory);
                         } else if (tokens[i].startsWith("%")) {
-                            if (tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
-                                args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
-                                if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
-                            } else if (tokens[i].charAt(1) == '%') {
-                                args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
-                            } else {
-                                throw new IllegalArgumentException("Address " + tokens[i] + " doesn't exist");
-                            }
+                            args[i] = extractGlobalAddress(tokens[i], memory);
                         } else {
                             args[i] = Float.parseFloat(tokens[i]);
                         }
@@ -89,23 +101,9 @@ public class Parser {
                 }
             } else {
                 if (tokens[i].startsWith(".")) {
-                    int parentPath = StringTools.extractParentPath(tokens[i]);
-
-                    int slot = parentPath % 10;
-                    int parentLevel = parentPath / 10;
-
-                    Node curr = new Node(node);
-                    for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
-
-                    args[i] = String.format("a%d", curr.id * 10 + slot);
-                    if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
+                    args[i] = extractLocalAddress(tokens[i], node, memory);
                 } else if (tokens[i].startsWith("%")) {
-                    if(tokens[i].charAt(1) >= '0' && tokens[i].charAt(1) <= '9') {
-                        args[i] = String.format("g%d", tokens[i].charAt(1) - '0');
-                        if(!memory.containsKey((String) args[i])) memory.put((String) args[i], 0f);
-                    } else {
-                        args[i] = String.format("gg%d", tokens[i].charAt(2) - '0');
-                    }
+                    args[i] = extractGlobalAddress(tokens[i], memory);
                 } else {
                     args[i] = Float.parseFloat(tokens[i]);
                 }
@@ -125,12 +123,7 @@ public class Parser {
                     args[8] = String.format("a%d", node.parentNode.id * 10 + --valSlot);
                     memory.put((String) args[8], 0f);
                 } else if (tokens[i + 1].charAt(0) == '%') {
-                    if(tokens[i + 1].charAt(1) >= '0' && tokens[i + 1].charAt(1) <= '9') {
-                        args[8] = String.format("g%d", tokens[i + 1].charAt(1) - '0');
-                        memory.put((String) args[i + 1], 0f);
-                    } else {
-                        args[8] = String.format("gg%d", tokens[i + 1].charAt(2) - '0');
-                    }
+                    args[8] = extractGlobalAddress(tokens[i + 1], memory);
                 }
             }
             if (tokens[i].equals("repeat")) {
@@ -139,22 +132,9 @@ public class Parser {
                     args[7] =  Integer.parseInt(tokens[i + 1]);
                 } catch (Exception exception) {
                     if(tokens[i + 1].startsWith(".")) {
-                        int parentPath = StringTools.extractParentPath(tokens[i + 1]);
-
-                        int slot = parentPath % 10;
-                        int parentLevel = parentPath / 10;
-
-                        Node curr = new Node(node);
-                        for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
-
-                        args[7] = String.format("a%d", curr.id * 10 + slot);
-                        memory.put((String) args[i], 0f);
+                        args[7] = extractLocalAddress(tokens[i + 1], node, memory);
                     } else {
-                        if (tokens[i + 1].startsWith("%%")) {
-                            args[7] = String.format("gg%d", tokens[i + 1].charAt(2) - '0');
-                        }else {
-                            args[7] = String.format("g%d", tokens[i + 1].charAt(1) - '0');
-                        }
+                        args[7] = extractGlobalAddress(tokens[i + 1], memory);
                     }
                 }
             }
