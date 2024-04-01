@@ -17,7 +17,7 @@ import java.util.Scanner;
 
 public class Parser {
     public HashMap<String, Node> functions;
-    private HashMap<String, String> aliases;
+    public HashMap<String, String> aliases;
 
     public String extractGlobalAddress(String data, HashMap<String, Float> memory) {
         if(data.charAt(1) >= '0' && data.charAt(1) <= '9') {

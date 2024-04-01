@@ -149,6 +149,7 @@ public class Main {
                     HashMap<String, Float> memory = new HashMap<>();
 
                     Parser parser = new Parser();
+                    parser.aliases = new HashMap<>();
 
                     List<Node> nodes = new ArrayList<>();
                     int nodeId = 0;
