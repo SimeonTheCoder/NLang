@@ -148,16 +148,16 @@ public enum BasicOperation implements Operation{
         @Override
         public ObjType[] getArguments() {
             return new ObjType[] {
-                    ObjType.NUMBER, ObjType.NUMBER, ObjType.ENUM, ObjType.FUNCTION, ObjType.FUNCTION
+                    ObjType.NUMBER, ObjType.ENUM, ObjType.NUMBER, ObjType.FUNCTION, ObjType.FUNCTION
             };
         }
 
         @Override
         public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             float valA = Interpreter.getValue(instruction[1], memory);
-            float valB = Interpreter.getValue(instruction[2], memory);
+            float valB = Interpreter.getValue(instruction[3], memory);
 
-            switch ((Integer) instruction[3]) {
+            switch ((Integer) instruction[2]) {
                 case 0:
                     if (valA == valB) {
                         Interpreter.interpret((Node) instruction[4], memory);
