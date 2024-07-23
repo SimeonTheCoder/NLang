@@ -25,7 +25,7 @@ public class EnumUtils {
     static Class<?> customOperation;
 
     public static void initClass() throws ClassNotFoundException {
-        customOperation = Class.forName("build.CustomOperation", true, classLoader);
+        customOperation = Class.forName("CustomOperation", true, classLoader);
     }
 
     public static Operation getOperation(String name) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
