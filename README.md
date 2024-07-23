@@ -16,7 +16,7 @@ A node based functional programming language, running on the JVM. Functions are 
 Instructions headers and enumeration values are **case insensitive**.
 
 # Commands
-### Instalation
+### Installation
 To install Nlang, open powershell and navigate to the location where you want to create a project. Then, run the following commands:
 
 ```
