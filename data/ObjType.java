@@ -5,5 +5,10 @@ public enum ObjType {
     FUNCTION,
     ENUM,
     STRING,
-    MULTIPLE
+    MULTIPLE;
+
+    @Override
+    public String toString() {
+        return name();
+    }
 }

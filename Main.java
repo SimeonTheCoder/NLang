@@ -1,5 +1,6 @@
 import executor.ThreadManager;
 import nodes.Node;
+import operations.Operation;
 import parser.Interpreter;
 import parser.Linker;
 import parser.Parser;
@@ -171,7 +172,7 @@ public class Main {
                             nodes.add(node);
 
                             memory.put(String.format("a%d", (nodeId - 1) * 10), Float.parseFloat(line));
-                        } else if (!line.equals("memdump")) {
+                        } else if (!line.equals("memdump") && !line.startsWith("args")) {
                             Node node = new Node();
                             node.id = nodeId++;
 
@@ -185,10 +186,20 @@ public class Main {
                                     parser.parseInstruction(line, node, memory),
                                     memory
                             );
-                        } else {
+                        } else if (!line.startsWith("args")){
                             for (Map.Entry<String, Float> entry : memory.entrySet()) {
                                 System.out.println(entry.getKey() + " -> " + entry.getValue());
                             }
+                        } else {
+                            String[] tokens = line.split(" ");
+
+                            Operation operation = EnumUtils.getOperation(tokens[1].toUpperCase());
+
+                            Arrays.stream(operation.getArguments()).forEach(a -> {
+                                System.out.print(a.toString() + " ");
+                            });
+
+                            System.out.println();
                         }
 
                         System.out.print(">> ");
