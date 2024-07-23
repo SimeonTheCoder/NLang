@@ -16,7 +16,7 @@ public class ThreadManager {
     }
 
     public void enqueueNode(Node mainNode, int threadIndex, int operationIndex) {
-        if (mainNode.parallelNodes.size() == 0) {
+        if (mainNode.parallelNodes.isEmpty()) {
             while (threads[threadIndex].queue.containsKey(operationIndex)) {
                 if(++threadIndex >= threads.length) {
                     threadIndex = 0;
@@ -25,10 +25,6 @@ public class ThreadManager {
             }
 
             threads[threadIndex].queue.put(operationIndex, mainNode.instruction);
-
-//            if(mainNode.instruction[0] == BasicOperation.CALL) {
-//                enqueueNode((Node) mainNode.instruction[1], threadIndex, operationIndex + 1);
-//            }
         } else {
             int currThreadIndex = threadIndex;
 

@@ -171,7 +171,7 @@ public class Main {
 
                             nodes.add(node);
 
-                            memory.put(String.format("a%d", (nodeId - 1) * 10), Float.parseFloat(line));
+                            memory.put("a" + ((nodeId - 1) * 10), Float.parseFloat(line));
                         } else if (!line.equals("memdump") && !line.startsWith("args")) {
                             Node node = new Node();
                             node.id = nodeId++;

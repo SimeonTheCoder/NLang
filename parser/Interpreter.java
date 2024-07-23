@@ -21,8 +21,7 @@ public class Interpreter {
 
         if (node.instruction != null) {
             threadManager.enqueue(node.instruction, threadIndex, operationIndex);
-//            executeInstruction(node.instruction, memory);
-            if (node.childNodes.size() > 0) {
+            if (!node.childNodes.isEmpty()) {
                 for (Node childNode : node.childNodes) interpretMain(childNode, memory, operationIndex++, threadIndex);
             }
         } else {
@@ -40,7 +39,7 @@ public class Interpreter {
     public static void interpret(Node node, HashMap<String, Float> memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         if (node.instruction != null) {
             executeInstruction(node.instruction, memory);
-            if (node.childNodes.size() > 0) {
+            if (!node.childNodes.isEmpty()) {
                 for (Node childNode : node.childNodes) interpret(childNode, memory);
             }
         } else {
@@ -54,23 +53,19 @@ public class Interpreter {
     public static float getValue(Object parsed, HashMap<String, Float> memory) {
         float val;
 
-        try {
+        if (parsed instanceof Float) {
             val = (Float) parsed;
-        } catch (Exception exception) {
-            try {
-                if (String.valueOf(parsed).startsWith("gg")) {
-                    int index = Math.round(
-                            memory.get(
-                                    String.format("g%d", (String.valueOf(parsed).charAt(2) - '0'))
-                            )
-                    );
+        } else {
+            String asString = String.valueOf(parsed);
 
-                    val = memory.get(String.format("g%d", index));
-                } else {
-                    val = memory.get((String) parsed);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Invalid address " + parsed);
+            if (asString.charAt(1) == 'g') {
+                int index = Math.round(
+                        memory.get("g" + (asString.charAt(2) - '0'))
+                );
+
+                val = memory.get("g" + index);
+            } else {
+                val = memory.get(asString);
             }
         }
 
@@ -80,15 +75,9 @@ public class Interpreter {
     public static void executeInstruction(Object[] instruction, HashMap<String, Float> memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         int repetitions = 1;
 
-        try {
-            repetitions = (Integer) instruction[7];
-        } catch (Exception exception) {
-            try {
-                repetitions = Math.round(memory.get(String.valueOf(instruction[7])));
-            } catch (Exception exception2) {
-//                System.out.println(instruction.length);
-                return;
-            }
+        if (instruction[7] != null) {
+            Object value = instruction[7];
+            repetitions = (value instanceof String) ? (int) getValue(value, memory) : (Integer) value;
         }
 
         for (int l = 0; l < repetitions; l++) {

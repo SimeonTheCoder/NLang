@@ -91,10 +91,10 @@ public enum BasicOperation implements Operation{
 
             if (String.valueOf(instruction[1]).startsWith("gg")) {
                 int index = Math.round(memory.get(
-                        String.format("g%d", String.valueOf(instruction[1]).charAt(2) - '0')
+                        "g" + (String.valueOf(instruction[1]).charAt(2) - '0')
                 ));
 
-                memory.put(String.format("g%d", index), val);
+                memory.put("g" + index, val);
             } else {
                 memory.put((String) instruction[1], val);
             }
@@ -189,7 +189,7 @@ public enum BasicOperation implements Operation{
             if(val <= 0) throw new IllegalArgumentException("ALLOC supports only positive values");
 
             for (int i = 1; i <= Math.round(val) + 1; i++) {
-                String key = String.format("g%d", i);
+                String key = "g" + i;
 
                 if (memory.containsKey(key)) continue;
 

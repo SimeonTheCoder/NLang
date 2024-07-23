@@ -26,12 +26,12 @@ public class Parser {
         }
 
         if(data.charAt(1) >= '0' && data.charAt(1) <= '9') {
-            String address = String.format("g%s", data.substring(1));
-            if(!memory.containsKey((String) address)) memory.put((String) address, 0f);
+            String address = "g" + data.substring(1);
+            if(!memory.containsKey(address)) memory.put(address, 0f);
 
             return address;
         } else if (data.charAt(1) == '%') {
-            return String.format("gg%s", data.substring(2));
+            return "gg" + data.substring(2);
         } else {
             throw new IllegalArgumentException("Address " + data + " doesn't exist");
         }
@@ -46,7 +46,7 @@ public class Parser {
         Node curr = new Node(node);
         for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
 
-        String address = String.format("a%d", curr.id * 10 + slot);
+        String address = "a" + (curr.id * 10 + slot);
         if(!memory.containsKey(address)) memory.put(address, 0f);
 
         return address;
@@ -66,10 +66,9 @@ public class Parser {
         String[] tokens = instruction.split("\\s+");
         Operation operation = EnumUtils.getOperation(tokens[0].toUpperCase());
 
-        Object[] args = new Object[10];
+        Object[] args = new Object[9];
         args[0] = operation;
-        args[8] = String.format("a%d", node.id * 10);
-        args[7] = 1;
+        args[8] = "a" + (node.id * 10);
         if(!memory.containsKey((String) args[8])) memory.put((String) args[8], 0f);
 
         boolean multiple = false;
@@ -130,11 +129,11 @@ public class Parser {
 
                 if (tokens[i + 1].charAt(0) == '&') {
                     int valSlot = tokens[i + 1].charAt(1) - '0';
-                    args[8] = String.format("a%d", node.parentNode.id * 10 + --valSlot);
+                    args[8] = "a" + node.parentNode.id * 10 + --valSlot;
                     memory.put((String) args[8], 0f);
                 } else if(tokens[i + 1].charAt(0) == '.') {
                     args[8] = extractLocalAddress(tokens[i + 1], node, memory);
-                } else if (tokens[i + 1].charAt(0) == '%' || tokens[i].startsWith("$")) {
+                } else if (tokens[i + 1].charAt(0) == '%' || tokens[i].charAt(0) == '$') {
                     args[8] = extractGlobalAddress(tokens[i + 1], memory);
                 }
             }
@@ -142,7 +141,7 @@ public class Parser {
                 try {
                     args[7] = Integer.parseInt(tokens[i + 1]);
                 } catch (Exception exception) {
-                    if(tokens[i + 1].startsWith(".")) {
+                    if(tokens[i + 1].charAt(0) == '.') {
                         args[7] = extractLocalAddress(tokens[i + 1], node, memory);
                     } else {
                         args[7] = extractGlobalAddress(tokens[i + 1], memory);

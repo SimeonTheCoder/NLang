@@ -32,8 +32,7 @@ public class EnumUtils {
         Operation op;
 
         try {
-            op = BasicOperation.valueOf(name);
-            return op;
+            return BasicOperation.valueOf(name);
         } catch (Exception e) {
             Method valueOf = customOperation.getMethod("valueOf", String.class);
             Object value = valueOf.invoke(null, name);
