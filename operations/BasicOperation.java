@@ -108,13 +108,7 @@ public enum BasicOperation implements Operation{
 
         @Override
         public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) {
-            float val = Interpreter.getValue(instruction[1], memory);
-
-            if (val == Math.round(val)) {
-                System.out.print((int) val);
-            } else {
-                System.out.print(val);
-            }
+            System.out.print(Interpreter.getValue(instruction[1], memory));
         }
     },
     INP {
@@ -126,10 +120,7 @@ public enum BasicOperation implements Operation{
         @Override
         public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) {
             Scanner scanner = new Scanner(System.in);
-
-            float val = Float.parseFloat(scanner.nextLine());
-
-            memory.put((String) instruction[8], val);
+            memory.put((String) instruction[8], Float.parseFloat(scanner.nextLine()));
         }
     },
     CALL {
@@ -139,7 +130,8 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             if(instruction[1] == null) throw new IllegalArgumentException("Function does not exist.");
             Interpreter.interpret((Node) instruction[1], memory);
         }
@@ -153,67 +145,19 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             float valA = Interpreter.getValue(instruction[1], memory);
             float valB = Interpreter.getValue(instruction[3], memory);
 
             switch ((Integer) instruction[2]) {
-                case 0:
-                    if (valA == valB) {
-                        Interpreter.interpret((Node) instruction[4], memory);
-                    } else {
-                        Interpreter.interpret((Node) instruction[5], memory);
-                    }
-
-                    break;
-
-                case 1:
-                    if (valA > valB) {
-                        Interpreter.interpret((Node) instruction[4], memory);
-                    } else {
-                        Interpreter.interpret((Node) instruction[5], memory);
-                    }
-
-                    break;
-
-                case 2:
-                    if (valA < valB) {
-                        Interpreter.interpret((Node) instruction[4], memory);
-                    } else {
-                        Interpreter.interpret((Node) instruction[5], memory);
-                    }
-
-                    break;
-
-                case 3:
-                    if (valA >= valB) {
-                        Interpreter.interpret((Node) instruction[4], memory);
-                    } else {
-                        Interpreter.interpret((Node) instruction[5], memory);
-                    }
-
-                    break;
-
-                case 4:
-                    if (valA <= valB) {
-                        Interpreter.interpret((Node) instruction[4], memory);
-                    } else {
-                        Interpreter.interpret((Node) instruction[5], memory);
-                    }
-
-                    break;
-
-                case 5:
-                    if (valA != valB) {
-                        Interpreter.interpret((Node) instruction[4], memory);
-                    } else {
-                        Interpreter.interpret((Node) instruction[5], memory);
-                    }
-
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("Invalid comparison");
+                case 0 -> Interpreter.interpret((Node) instruction[valA == valB ? 4 : 5], memory);
+                case 1 -> Interpreter.interpret((Node) instruction[valA > valB ? 4 : 5], memory);
+                case 2 -> Interpreter.interpret((Node) instruction[valA < valB ? 4 : 5], memory);
+                case 3 -> Interpreter.interpret((Node) instruction[valA >= valB ? 4 : 5], memory);
+                case 4 -> Interpreter.interpret((Node) instruction[valA <= valB ? 4 : 5], memory);
+                case 5 -> Interpreter.interpret((Node) instruction[valA != valB ? 4 : 5], memory);
+                default -> throw new IllegalArgumentException("Invalid comparison");
             }
 
             float result = valA + valB;
@@ -228,13 +172,7 @@ public enum BasicOperation implements Operation{
 
         @Override
         public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) {
-            float val = Interpreter.getValue(instruction[1], memory);
-
-            if (val == Math.round(val)) {
-                System.out.println((int) val);
-            } else {
-                System.out.println(val);
-            }
+            System.out.println(Interpreter.getValue(instruction[1], memory));
         }
     },
     ALLOC {
@@ -244,7 +182,8 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException {
             float val = Interpreter.getValue(instruction[1], memory);
 
             if(val <= 0) throw new IllegalArgumentException("ALLOC supports only positive values");
@@ -265,11 +204,10 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException {
             String filename = String.valueOf(instruction[1]);
             float val = Interpreter.getValue(instruction[2], memory);
-
-//            if(!writableFiles.containsKey(filename)) throw new IllegalArgumentException("File " + filename + " isn't open");
 
             writableFiles.get(filename).content.append(val).append(System.lineSeparator());
         }
@@ -281,14 +219,12 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException {
             String filename = String.valueOf(instruction[1]);
 
             writableFiles.put(
-                    filename,
-                    new WritableFile(
-                            new File(filename)
-                    )
+                    filename, new WritableFile( new File(filename) )
             );
         }
     },
@@ -299,7 +235,8 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException {
             String filename = String.valueOf(instruction[1]);
 
             if(writableFiles.containsKey(filename)) {
@@ -321,14 +258,12 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException {
             String filename = String.valueOf(instruction[1]);
 
             readableFiles.put(
-                    filename,
-                    new ReadableFile(
-                            new File(filename)
-                    )
+                    filename, new ReadableFile( new File(filename) )
             );
         }
     },
@@ -339,18 +274,19 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {
-            if ((Integer) instruction[2] == 6) {
-                String filename = String.valueOf(instruction[1]);
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException {
+            if ((Integer) instruction[2] != 6) return;
 
-                if(!readableFiles.containsKey(filename)) throw new IllegalArgumentException("File " + filename + " isn't open");
+            String filename = String.valueOf(instruction[1]);
 
-                Float data = Float.parseFloat(
-                        readableFiles.get(String.valueOf(instruction[1])).scanner.nextLine()
-                );
+            if(!readableFiles.containsKey(filename)) throw new IllegalArgumentException("File " + filename + " isn't open");
 
-                memory.put((String) instruction[8], data);
-            }
+            Float data = Float.parseFloat(
+                    readableFiles.get(String.valueOf(instruction[1])).scanner.nextLine()
+            );
+
+            memory.put((String) instruction[8], data);
         }
     },
     IMPORT {
@@ -360,7 +296,8 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
+                throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             HashMap<String, Float> memory2 = new HashMap<>();
 
             List<String> args = new ArrayList<>();
@@ -371,20 +308,22 @@ public enum BasicOperation implements Operation{
             }
 
             Parser parser = new Parser();
-
             parser.parse(new File(instruction[1] + ".nlp"), memory2);
 
             Linker linker = new Linker();
 
             linker.linkArgs(
-                    args.stream().map(
-                            Float::parseFloat
-                    ).collect(Collectors.toList()).toArray(new Float[]{}),
+                    args.stream().map(Float::parseFloat)
+                            .collect(Collectors.toList())
+                            .toArray(new Float[]{}),
                     memory2
             );
 
             try {
-                Interpreter.interpret(parser.functions.get(String.valueOf(instruction[2])), memory2);
+                Interpreter.interpret(
+                        parser.functions.get(String.valueOf(instruction[2])),
+                        memory2
+                );
             } catch (Exception e) {
                 throw new IllegalArgumentException("Function " + instruction[2] + " doesn't exist");
             }

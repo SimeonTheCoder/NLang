@@ -7,6 +7,7 @@ import operations.Operation;
 import utils.EnumUtils;
 import utils.StringTools;
 
+import java.io.DataInput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
@@ -20,6 +21,10 @@ public class Parser {
     public HashMap<String, String> aliases;
 
     public String extractGlobalAddress(String data, HashMap<String, Float> memory) {
+        if(data.charAt(0) == '$') {
+            return data.substring(1);
+        }
+
         if(data.charAt(1) >= '0' && data.charAt(1) <= '9') {
             String address = String.format("g%s", data.substring(1));
             if(!memory.containsKey((String) address)) memory.put((String) address, 0f);
@@ -47,6 +52,16 @@ public class Parser {
         return address;
     }
 
+    public Object extractNumber(String token, Node node, HashMap<String, Float> memory) {
+        if (token.charAt(0) == '.') {
+            return extractLocalAddress(token, node, memory);
+        } else if (token.charAt(0) == '%' || token.charAt(0) == '$') {
+            return extractGlobalAddress(token, memory);
+        }
+
+        return Float.parseFloat(token);
+    }
+
     public Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         String[] tokens = instruction.split("\\s+");
         Operation operation = EnumUtils.getOperation(tokens[0].toUpperCase());
@@ -63,52 +78,47 @@ public class Parser {
             if(i >= tokens.length) break;
             if(!multiple && i > operation.getArguments().length) break;
 
-            if(!multiple) {
-                switch (operation.getArguments()[i - 1]) {
-                    case NUMBER:
-                    case MULTIPLE: {
-                        if (aliases.containsKey(tokens[i])) {
-                            tokens[i] = aliases.get(tokens[i]);
-                        }
-
-                        if (tokens[i].startsWith(".")) {
-                            args[i] = extractLocalAddress(tokens[i], node, memory);
-                        } else if (tokens[i].startsWith("%")) {
-                            args[i] = extractGlobalAddress(tokens[i], memory);
-                        } else {
-                            args[i] = Float.parseFloat(tokens[i]);
-                        }
-
-                        if (operation.getArguments()[i - 1] == ObjType.MULTIPLE) multiple = true;
-
-                        break;
-                    }
-
-                    case FUNCTION: {
-                        args[i] = functions.get(tokens[i]);
-                        break;
-                    }
-
-                    case ENUM: {
-                        args[i] = DataEnums.valueOf(tokens[i].toUpperCase()).ordinal();
-                        break;
-                    }
-
-                    case STRING: {
-                        args[i] = tokens[i];
-                        break;
-                    }
-                }
-            } else {
-                if (tokens[i].startsWith(".")) {
-                    args[i] = extractLocalAddress(tokens[i], node, memory);
-                } else if (tokens[i].startsWith("%")) {
-                    args[i] = extractGlobalAddress(tokens[i], memory);
-                } else {
-                    args[i] = Float.parseFloat(tokens[i]);
-                }
-
+            if(multiple) {
+                args[i] = extractNumber(tokens[i], node, memory);
                 break;
+            }
+
+            switch (operation.getArguments()[i - 1]) {
+                case NUMBER:
+                case MULTIPLE: {
+                    if (aliases.containsKey(tokens[i])) tokens[i] = aliases.get(tokens[i]);
+                    args[i] = extractNumber(tokens[i], node, memory);
+
+                    if (operation.getArguments()[i - 1] == ObjType.MULTIPLE) multiple = true;
+
+                    break;
+                }
+
+                case FUNCTION: {
+                    args[i] = functions.get(tokens[i]);
+                    break;
+                }
+
+                case ENUM: {
+                    DataEnums result = DataEnums.EQUAL;
+
+                    switch (tokens[i]) {
+                        case ">" -> result = DataEnums.GREATER_THAN;
+                        case "<" -> result = DataEnums.LESS_THAN;
+                        case "==" -> result = DataEnums.EQUAL;
+                        case ">=" -> result = DataEnums.GREATER_EQUAL;
+                        case "<=" -> result = DataEnums.LESS_EQUAL;
+                        case "!=" -> result = DataEnums.NOT_EQUAL;
+                    }
+
+                    args[i] = result.ordinal();
+                    break;
+                }
+
+                case STRING: {
+                    args[i] = tokens[i];
+                    break;
+                }
             }
         }
 
@@ -118,18 +128,19 @@ public class Parser {
                     tokens[i + 1] = aliases.get(tokens[i + 1]);
                 }
 
-                if(tokens[i + 1].charAt(0) == '&') {
+                if (tokens[i + 1].charAt(0) == '&') {
                     int valSlot = tokens[i + 1].charAt(1) - '0';
                     args[8] = String.format("a%d", node.parentNode.id * 10 + --valSlot);
                     memory.put((String) args[8], 0f);
-                } else if (tokens[i + 1].charAt(0) == '%') {
+                } else if(tokens[i + 1].charAt(0) == '.') {
+                    args[8] = extractLocalAddress(tokens[i + 1], node, memory);
+                } else if (tokens[i + 1].charAt(0) == '%' || tokens[i].startsWith("$")) {
                     args[8] = extractGlobalAddress(tokens[i + 1], memory);
                 }
             }
             if (tokens[i].equals("repeat")) {
-//                node.repetitions = Integer.parseInt(tokens[i + 1]);
                 try {
-                    args[7] =  Integer.parseInt(tokens[i + 1]);
+                    args[7] = Integer.parseInt(tokens[i + 1]);
                 } catch (Exception exception) {
                     if(tokens[i + 1].startsWith(".")) {
                         args[7] = extractLocalAddress(tokens[i + 1], node, memory);
