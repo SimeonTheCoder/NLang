@@ -10,9 +10,9 @@ import java.util.Map;
 
 public class ExecutorThread extends Thread {
     public LinkedHashMap<Integer, Object[]> queue;
-    public HashMap<String, Float> memory;
+    public float[] memory;
 
-    public ExecutorThread(HashMap<String, Float> memory) {
+    public ExecutorThread(float[] memory) {
         this.memory = memory;
         this.queue = new LinkedHashMap<>();
     }

@@ -16,7 +16,7 @@ public class Interpreter {
 
     public static ThreadManager threadManager;
 
-    public static void interpretMain(Node node, HashMap<String, Float> memory, int operationIndex, int threadIndex) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public static void interpretMain(Node node, float[] memory, int operationIndex, int threadIndex) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         if (operationIndex == 0) threadManager = new ThreadManager(8, memory);
 
         if (node.instruction != null) {
@@ -36,7 +36,7 @@ public class Interpreter {
         }
     }
 
-    public static void interpret(Node node, HashMap<String, Float> memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public static void interpret(Node node, float[] memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         if (node.instruction != null) {
             executeInstruction(node.instruction, memory);
             if (!node.childNodes.isEmpty()) {
@@ -50,29 +50,27 @@ public class Interpreter {
         }
     }
 
-    public static float getValue(Object parsed, HashMap<String, Float> memory) {
+    public static float getValue(Object parsed, float[] memory) {
         float val;
 
         if (parsed instanceof Float) {
             val = (Float) parsed;
         } else {
-            String asString = String.valueOf(parsed);
+            int address = (Integer) parsed;
 
-            if (asString.charAt(1) == 'g') {
-                int index = Math.round(
-                        memory.get("g" + (asString.charAt(2) - '0'))
-                );
-
-                val = memory.get("g" + index);
-            } else {
-                val = memory.get(asString);
+            if(address > 2048) {
+                address -= 2048;
+                float value = memory[address];
+                address = (int) Math.floor(value) + 1536;
             }
+
+            val = memory[address];
         }
 
         return val;
     }
 
-    public static void executeInstruction(Object[] instruction, HashMap<String, Float> memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public static void executeInstruction(Object[] instruction, float[] memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         int repetitions = 1;
 
         if (instruction[7] != null) {

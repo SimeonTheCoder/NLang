@@ -20,7 +20,7 @@ public class Main {
             if (args.length != 0 && !args[0].startsWith("--")) {
                 EnumUtils.initClass();
 
-                HashMap<String, Float> memory = new HashMap<>();
+                float[] memory = new float[2048];
 
                 Parser parser = new Parser();
                 Node mainNode = parser.parse(new File(args[0] + ".nlp"), memory);
@@ -106,7 +106,7 @@ public class Main {
                                     "        }\n" +
                                     "\n" +
                                     "        @Override\n" +
-                                    "        public void execute(Object[] instruction, HashMap<String, Float> memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {\n" +
+                                    "        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {\n" +
                                     "            System.out.println(\"Pong!\");\n" +
                                     "        }\n" +
                                     "    };\n" +
@@ -147,7 +147,7 @@ public class Main {
                 } else {
                     EnumUtils.initClass();
 
-                    HashMap<String, Float> memory = new HashMap<>();
+                    float[] memory = new float[2048];
 
                     Parser parser = new Parser();
                     parser.aliases = new HashMap<>();
@@ -171,7 +171,7 @@ public class Main {
 
                             nodes.add(node);
 
-                            memory.put("a" + ((nodeId - 1) * 10), Float.parseFloat(line));
+                            memory[(nodeId - 1) * 10] = Float.parseFloat(line);
                         } else if (!line.equals("memdump") && !line.startsWith("args")) {
                             Node node = new Node();
                             node.id = nodeId++;
@@ -187,8 +187,8 @@ public class Main {
                                     memory
                             );
                         } else if (!line.startsWith("args")){
-                            for (Map.Entry<String, Float> entry : memory.entrySet()) {
-                                System.out.println(entry.getKey() + " -> " + entry.getValue());
+                            for (int i = 0; i < 2048; i ++) {
+                                System.out.println(i + " -> " + memory[i]);
                             }
                         } else {
                             String[] tokens = line.split(" ");

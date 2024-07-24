@@ -7,7 +7,6 @@ import operations.Operation;
 import utils.EnumUtils;
 import utils.StringTools;
 
-import java.io.DataInput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
@@ -20,24 +19,24 @@ public class Parser {
     public HashMap<String, Node> functions;
     public HashMap<String, String> aliases;
 
-    public String extractGlobalAddress(String data, HashMap<String, Float> memory) {
+    public int extractGlobalAddress(String data, float[] memory) {
         if(data.charAt(0) == '$') {
-            return data.substring(1);
+            return Integer.parseInt(data.substring(1)) + 1536;
         }
 
         if(data.charAt(1) >= '0' && data.charAt(1) <= '9') {
-            String address = "g" + data.substring(1);
-            if(!memory.containsKey(address)) memory.put(address, 0f);
-
-            return address;
-        } else if (data.charAt(1) == '%') {
-            return "gg" + data.substring(2);
-        } else {
+            int address = Integer.parseInt(data.substring(1));
+            return address + 1536;
+        }
+        else if (data.charAt(1) == '%') {
+            return Integer.parseInt(data.substring(2)) + 1536 + 2048;
+        }
+        else {
             throw new IllegalArgumentException("Address " + data + " doesn't exist");
         }
     }
 
-    public String extractLocalAddress(String data, Node node, HashMap<String, Float> memory) {
+    public int extractLocalAddress(String data, Node node, float[] memory) {
         int parentPath = StringTools.extractParentPath(data);
 
         int slot = parentPath % 10;
@@ -46,13 +45,10 @@ public class Parser {
         Node curr = new Node(node);
         for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
 
-        String address = "a" + (curr.id * 10 + slot);
-        if(!memory.containsKey(address)) memory.put(address, 0f);
-
-        return address;
+        return curr.id * 10 + slot;
     }
 
-    public Object extractNumber(String token, Node node, HashMap<String, Float> memory) {
+    public Object extractNumber(String token, Node node, float[] memory) {
         if (token.charAt(0) == '.') {
             return extractLocalAddress(token, node, memory);
         } else if (token.charAt(0) == '%' || token.charAt(0) == '$') {
@@ -62,14 +58,13 @@ public class Parser {
         return Float.parseFloat(token);
     }
 
-    public Object[] parseInstruction(String instruction, Node node, HashMap<String, Float> memory) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public Object[] parseInstruction(String instruction, Node node, float[] memory) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         String[] tokens = instruction.split("\\s+");
         Operation operation = EnumUtils.getOperation(tokens[0].toUpperCase());
 
         Object[] args = new Object[9];
         args[0] = operation;
-        args[8] = "a" + (node.id * 10);
-        if(!memory.containsKey((String) args[8])) memory.put((String) args[8], 0f);
+        args[8] = node.id * 10;
 
         boolean multiple = false;
 
@@ -130,7 +125,6 @@ public class Parser {
                 if (tokens[i + 1].charAt(0) == '&') {
                     int valSlot = tokens[i + 1].charAt(1) - '0';
                     args[8] = "a" + node.parentNode.id * 10 + --valSlot;
-                    memory.put((String) args[8], 0f);
                 } else if(tokens[i + 1].charAt(0) == '.') {
                     args[8] = extractLocalAddress(tokens[i + 1], node, memory);
                 } else if (tokens[i + 1].charAt(0) == '%' || tokens[i].charAt(0) == '$') {
@@ -153,7 +147,7 @@ public class Parser {
         return args;
     }
 
-    public Node parse(File file, HashMap<String, Float> memory) throws FileNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public Node parse(File file, float[] memory) throws FileNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         Scanner scanner = new Scanner(file);
 
         List<String> lines = new ArrayList<>();
@@ -180,7 +174,7 @@ public class Parser {
                     Node node = new Node();
                     boolean func = false;
 
-                    if (lines.get(currLine).trim().endsWith("(")) {
+                    if (lines.get(currLine).trim().endsWith("{")) {
                         if (lines.get(currLine).trim().startsWith("repeat")) {
                             int amount = Integer.parseInt(lines.get(currLine).trim().split(" ")[1]);
                             node.repetitions = amount;
@@ -236,7 +230,7 @@ public class Parser {
             }
         }
 
-        if(nodes.size() == 0) return null;
-        return nodes.get(0);
+        if(nodes.isEmpty()) return null;
+        return nodes.getFirst();
     }
 }

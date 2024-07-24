@@ -6,9 +6,9 @@ import java.util.HashMap;
 
 public class ThreadManager {
     public ExecutorThread[] threads;
-    HashMap<String, Float> memory;
+    private float[] memory;
 
-    public ThreadManager(int threadCount, HashMap<String, Float> memory) {
+    public ThreadManager(int threadCount, float[] memory) {
         this.threads = new ExecutorThread[threadCount];
         this.memory = memory;
 
