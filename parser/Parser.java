@@ -62,7 +62,7 @@ public class Parser {
 
         boolean multiple = false;
 
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i < 9; i++) {
             if(i >= tokens.length) break;
             if(!multiple && i > operation.getArguments().length) break;
 
@@ -152,30 +152,39 @@ public class Parser {
         functions = new HashMap<>();
         aliases = new HashMap<>();
 
-        while (scanner.hasNextLine()) lines.add(scanner.nextLine());
+        int maxIndentation = 0;
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            lines.add(line);
+
+            maxIndentation = Math.max(maxIndentation, StringTools.indentation(line));
+        }
 
         List<Node> nodes = new ArrayList<>();
         Node[] nodeMap = new Node[lines.size()];
 
         int currId = 0;
 
-        for (int level = 0; level < 64; level++) {
+        for (int level = 0; level < maxIndentation; level++) {
             for (int currLine = 0; currLine < lines.size(); currLine++) {
-                if(lines.get(currLine).trim().isEmpty()) continue;
+                String line = lines.get(currLine);
 
-                if(lines.get(currLine).startsWith("alias")) {
-                    aliases.put(lines.get(currLine).split(" ")[3], lines.get(currLine).split(" ")[1]);
+                if(line.trim().isEmpty()) continue;
+
+                if(line.startsWith("alias")) {
+                    aliases.put(line.split(" ")[3], line.split(" ")[1]);
                     continue;
                 }
 
-                if (StringTools.indentation(lines.get(currLine)) == level) {
+                if (StringTools.indentation(line) == level) {
                     Node node = new Node();
                     boolean func = false;
 
-                    if (lines.get(currLine).trim().endsWith("{")) {
-                        if (lines.get(currLine).trim().startsWith("repeat")) {
+                    if (line.trim().endsWith("{")) {
+                        if (line.trim().startsWith("repeat")) {
                             node.repetitions = Integer.parseInt(lines.get(currLine).trim().split(" ")[1]);
-                        }else if (lines.get(currLine).trim().contains("func")) {
+                        }else if (line.trim().contains("func")) {
                             functions.put(lines.get(currLine).trim().split(" ")[1], node);
                             func = true;
                         }
@@ -184,7 +193,7 @@ public class Parser {
                             if (StringTools.indentation(lines.get(pointer)) == level) {
                                 for (int i = currLine; i <= pointer; i++) nodeMap[i] = node;
 
-                                node.level = level + (func ? 0 : 4);
+                                node.level = level + (func ? 0 : 1);
                                 if (level != 0) node.parentNode = nodeMap[currLine - 1];
 
                                 node.id = currId++;
