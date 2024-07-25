@@ -38,18 +38,22 @@ public class Main {
 
                 threadManager.startAll();
 
-                boolean working = true;
-
-                while (working) {
-                    working = false;
-
-                    for(int i = 0; i < threadManager.threads.length; i++) {
-                        if (threadManager.threads[i].isAlive()) {
-                            working = true;
-                            break;
-                        }
-                    }
+                for(int i = 0; i < threadManager.threads.length; i ++) {
+                    threadManager.threads[i].join();
                 }
+
+//                boolean working = true;
+//
+//                while (working) {
+//                    working = false;
+//
+//                    for(int i = 0; i < threadManager.threads.length; i++) {
+//                        if (threadManager.threads[i].isAlive()) {
+//                            working = true;
+//                            break;
+//                        }
+//                    }
+//                }
 
                 long end = System.currentTimeMillis();
 
