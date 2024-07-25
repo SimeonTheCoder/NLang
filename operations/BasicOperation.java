@@ -3,6 +3,7 @@ package operations;
 import data.ObjType;
 import data.ReadableFile;
 import data.WritableFile;
+import memory.MemoryManager;
 import nodes.Node;
 import parser.Interpreter;
 import parser.Linker;
@@ -111,9 +112,9 @@ public enum BasicOperation implements Operation{
 
             int address = (Integer) instruction[1];
 
-            if(address > 2048) {
-                address -= 2048;
-                address = (int) Math.floor(memory[address]) + 1536;
+            if(address > MemoryManager.TOTAL_AMOUNT) {
+                address -= MemoryManager.TOTAL_AMOUNT;
+                address = (int) Math.floor(memory[address]) + MemoryManager.LOCAL_AMOUNT;
             }
 
             memory[address] = val;
@@ -379,7 +380,7 @@ public enum BasicOperation implements Operation{
         @Override
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles)
                 throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-            float[] memory2 = new float[2048];
+            float[] memory2 = new float[MemoryManager.TOTAL_AMOUNT];
 
             List<String> args = new ArrayList<>();
 
@@ -409,7 +410,7 @@ public enum BasicOperation implements Operation{
                 throw new IllegalArgumentException("Function " + instruction[2] + " doesn't exist");
             }
 
-            memory[(Integer) instruction[8]] = memory2[1 + 1536];
+            memory[(Integer) instruction[8]] = memory2[1 + MemoryManager.LOCAL_AMOUNT];
         }
 
         @Override

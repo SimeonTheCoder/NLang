@@ -2,6 +2,7 @@ package parser;
 
 import data.ReadableFile;
 import data.WritableFile;
+import memory.MemoryManager;
 import nodes.Node;
 import operations.Operation;
 
@@ -33,9 +34,9 @@ public class Interpreter {
         } else {
             int address = (Integer) parsed;
 
-            if(address > 2048) {
-                address -= 2048;
-                address = (int) Math.floor(memory[address]) + 1536;
+            if(address > MemoryManager.TOTAL_AMOUNT) {
+                address -= MemoryManager.TOTAL_AMOUNT;
+                address = (int) Math.floor(memory[address]) + MemoryManager.LOCAL_AMOUNT;
             }
 
             return memory[address];

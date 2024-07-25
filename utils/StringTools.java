@@ -1,5 +1,7 @@
 package utils;
 
+import memory.MemoryManager;
+
 public class StringTools {
     public static int indentation(String s) {
         int offset = 0;
@@ -21,10 +23,10 @@ public class StringTools {
                 parentLevel ++;
             } else {
                 slot = s.charAt(i) - '0';
-                return parentLevel * 10 + slot;
+                return parentLevel * MemoryManager.NODE_SLOTS + slot;
             }
         }
 
-        return parentLevel * 10;
+        return parentLevel * MemoryManager.NODE_SLOTS;
     }
 }

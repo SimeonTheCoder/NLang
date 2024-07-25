@@ -2,6 +2,7 @@ package parser;
 
 import data.DataEnums;
 import data.ObjType;
+import memory.MemoryManager;
 import nodes.Node;
 import operations.Operation;
 import utils.EnumUtils;
@@ -24,22 +25,22 @@ public class Parser {
         char second = data.charAt(1);
 
         if (second >= '0' && second <= '9') {
-            return Integer.parseInt(data.substring(1)) + (first == '$' ? 0 : 1536);
+            return Integer.parseInt(data.substring(1)) + (first == '$' ? 0 : MemoryManager.LOCAL_AMOUNT);
         } else {
-            return Integer.parseInt(data.substring(2)) + 1536 + 2048;
+            return Integer.parseInt(data.substring(2)) + MemoryManager.LOCAL_AMOUNT + MemoryManager.TOTAL_AMOUNT;
         }
     }
 
     public int extractLocalAddress(String data, Node node, float[] memory) {
         int parentPath = StringTools.extractParentPath(data);
 
-        int slot = parentPath % 10;
-        int parentLevel = parentPath / 10;
+        int slot = parentPath % MemoryManager.NODE_SLOTS;
+        int parentLevel = parentPath / MemoryManager.NODE_SLOTS;
 
         Node curr = new Node(node);
         for (int j = 0; j < parentLevel; j++) curr = new Node(curr.parentNode);
 
-        return curr.id * 10 + slot;
+        return curr.id * MemoryManager.NODE_SLOTS + slot;
     }
 
     public Object extractNumber(String token, Node node, float[] memory) {
@@ -58,7 +59,7 @@ public class Parser {
 
         Object[] args = new Object[9];
         args[0] = operation;
-        args[8] = node.id * 10;
+        args[8] = node.id * MemoryManager.NODE_SLOTS;
 
         boolean multiple = false;
 
@@ -122,7 +123,7 @@ public class Parser {
 
                 if (first == '&') {
                     int valSlot = tokens[i + 1].charAt(1) - '0';
-                    args[8] = node.parentNode.id * 10 + --valSlot;
+                    args[8] = node.parentNode.id * MemoryManager.NODE_SLOTS + --valSlot;
                 } else if(first == '.') {
                     args[8] = extractLocalAddress(nextToken, node, memory);
                 } else if (first == '%' || first == '$') {

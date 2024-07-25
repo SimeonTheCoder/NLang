@@ -1,7 +1,6 @@
-import data.ObjType;
 import executor.ThreadManager;
+import memory.MemoryManager;
 import nodes.Node;
-import operations.BasicOperation;
 import operations.Operation;
 import parser.Interpreter;
 import parser.Linker;
@@ -13,19 +12,41 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        MemoryManager.set(2048, 512, 4);
+
         try {
             if (args.length != 0 && !args[0].startsWith("--")) {
                 EnumUtils.initClass();
 
-                float[] memory = new float[2048];
+                float[] memory = new float[MemoryManager.TOTAL_AMOUNT];
+
+                int toSkip = 1;
+                int toReadArg = 0;
+
+                for (int i = 0; i < args.length; i ++) {
+                    if (args[i].charAt(0) == '-') {
+                        int val = Integer.parseInt(args[i].substring(2));
+
+                        switch (args[i].charAt(1)) {
+                            case 'G' -> MemoryManager.GLOBAL_AMOUNT = val;
+                            case 'L' -> MemoryManager.LOCAL_AMOUNT = val;
+                            case 'T' -> MemoryManager.TOTAL_AMOUNT = val;
+                            case 'N' -> MemoryManager.NODE_SLOTS = val;
+                        }
+
+                        toSkip++;
+                    } else {
+                        toReadArg = i;
+                    }
+                }
 
                 Parser parser = new Parser();
-                Node mainNode = parser.parse(new File(args[0] + ".nlp"), memory);
+                Node mainNode = parser.parse(new File(args[toReadArg] + ".nlp"), memory);
 
                 Linker linker = new Linker();
 
                 linker.linkArgs(
-                        Arrays.stream(args).skip(1).map(
+                        Arrays.stream(args).skip(toSkip).map(
                                 Float::parseFloat
                         ).toList().toArray(new Float[]{}),
                         memory
@@ -74,7 +95,7 @@ public class Main {
                 } else {
                     EnumUtils.initClass();
 
-                    float[] memory = new float[2048];
+                    float[] memory = new float[MemoryManager.TOTAL_AMOUNT];
 
                     Parser parser = new Parser();
                     parser.aliases = new HashMap<>();
@@ -119,8 +140,8 @@ public class Main {
 
                             nodes.add(node);
 
-                            memory[(nodeId - 1) * 10] = Float.parseFloat(line);
-                        } else if (!line.equals("memdump")) {
+                            memory[(nodeId - 1) * MemoryManager.NODE_SLOTS] = Float.parseFloat(line);
+                        } else if (!line.startsWith("memdump")) {
                             Node node = new Node();
                             node.id = nodeId++;
 
@@ -135,8 +156,18 @@ public class Main {
                                     memory
                             );
                         } else {
-                            for (int i = 0; i < 2048; i ++) {
-                                System.out.println(i + " -> " + memory[i]);
+                            boolean includeZero = line.endsWith("+0");
+
+                            if(line.contains("local")) {
+                                for (int i = 0; i < MemoryManager.LOCAL_AMOUNT; i ++) {
+                                    if(memory[i] == 0f && !includeZero) continue;
+                                    System.out.println("$" + i + " -> " + memory[i]);
+                                }
+                            } else if (line.contains("global")) {
+                                for (int i = MemoryManager.LOCAL_AMOUNT; i < MemoryManager.TOTAL_AMOUNT; i ++) {
+                                    if(memory[i] == 0f && !includeZero) continue;
+                                    System.out.println("$" + i + " (%" + (i - MemoryManager.LOCAL_AMOUNT) + ") -> " + memory[i]);
+                                }
                             }
                         }
 
