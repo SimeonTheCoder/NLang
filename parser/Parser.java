@@ -4,6 +4,7 @@ import data.DataEnums;
 import data.ObjType;
 import memory.MemoryManager;
 import nodes.Node;
+import operations.BasicOperation;
 import operations.Operation;
 import utils.EnumUtils;
 import utils.StringTools;
@@ -84,6 +85,13 @@ public class Parser {
                 }
 
                 case FUNCTION: {
+                    if(tokens[i].equals("null")) {
+                        Node node1 = new Node();
+                        node1.instruction[0] = BasicOperation.NULL;
+                        args[i] = node1;
+                        break;
+                    }
+
                     args[i] = functions.get(tokens[i]);
                     break;
                 }
@@ -165,7 +173,10 @@ public class Parser {
         int indentation = 0;
 
         for(int i = 0; i < lines.size(); i ++) {
-            if(lines.get(i).trim().isEmpty()) continue;
+            if(lines.get(i).trim().isEmpty()) {
+                lines.remove(i--);
+                continue;
+            }
 
             if(lines.get(i).startsWith("func") || lines.get(i).startsWith("}")) {
                 indentation = 0;
@@ -173,8 +184,15 @@ public class Parser {
 
                 if(lines.get(i).startsWith("func")) indentation++;
             } else {
+                if(lines.get(i).startsWith("alias")) continue;
+
                 lines.set(i, "\t".repeat(indentation) + lines.get(i));
                 indentation ++;
+            }
+
+            if(lines.get(i).contains("(") || lines.get(i).contains(")")) {
+                lines.set(i, lines.get(i).replace("(", ""));
+                lines.set(i, lines.get(i).replace(")", ""));
             }
         }
 
@@ -189,7 +207,7 @@ public class Parser {
 
         for (int level = 0; level <= maxIndentation; level++) {
             for (int currLine = 0; currLine < lines.size(); currLine++) {
-                if(lines.get(currLine).trim().isEmpty()) continue;
+                if(lines.get(currLine).trim().isEmpty() || lines.get(currLine).trim().equals("}")) continue;
 
                 if(lines.get(currLine).startsWith("alias")) {
                     aliases.put(lines.get(currLine).split(" ")[3], lines.get(currLine).split(" ")[1]);

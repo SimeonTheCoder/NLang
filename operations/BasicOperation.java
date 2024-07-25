@@ -417,5 +417,20 @@ public enum BasicOperation implements Operation{
         public String help() {
             return "Calls the function with name arg1 from NLang file with .nlp extension and name arg0. The arguments passed down are treated as registers by the called function. The returned output by the IMPORT instruction is the value at g1 in the function's memory";
         }
+    }, NULL {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[0];
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            return;
+        }
+
+        @Override
+        public String help() {
+            return "Does absolutely nothing";
+        }
     };
 }

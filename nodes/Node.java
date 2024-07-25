@@ -18,6 +18,8 @@ public class Node {
         this.parallelNodes = new ArrayList<>();
         this.childNodes = new ArrayList<>();
 
+        this.instruction = new Object[9];
+
         this.repetitions = 1;
     }
 

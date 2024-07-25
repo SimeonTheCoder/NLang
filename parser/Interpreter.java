@@ -52,6 +52,7 @@ public class Interpreter {
         }
 
         for (int l = 0; l < repetitions; l++) {
+            if(instruction[0] == null) break;
             ((Operation) instruction[0]).execute(instruction, memory, writableFiles, readableFiles);
         }
     }

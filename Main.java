@@ -12,6 +12,9 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        args = new String[1];
+        args[0] = "fact";
+
         MemoryManager.set(2048, 512, 4);
 
         try {
