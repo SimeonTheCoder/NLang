@@ -157,8 +157,28 @@ public class Parser {
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             lines.add(line);
+        }
 
-            maxIndentation = Math.max(maxIndentation, StringTools.indentation(line));
+        lines.replaceAll(String::trim);
+
+        int indentation = 0;
+
+        for(int i = 0; i < lines.size(); i ++) {
+            if(lines.get(i).trim().isEmpty()) continue;
+
+            if(lines.get(i).startsWith("func") || lines.get(i).startsWith("}")) {
+                indentation = 0;
+                lines.set(i, lines.get(i));
+
+                if(lines.get(i).startsWith("func")) indentation++;
+            } else {
+                lines.set(i, "\t".repeat(indentation) + lines.get(i));
+                indentation ++;
+            }
+        }
+
+        for (int i = 0; i < lines.size(); i ++) {
+            maxIndentation = Math.max(maxIndentation, StringTools.indentation(lines.get(i)));
         }
 
         List<Node> nodes = new ArrayList<>();
@@ -166,25 +186,21 @@ public class Parser {
 
         int currId = 0;
 
-        for (int level = 0; level < maxIndentation; level++) {
+        for (int level = 0; level <= maxIndentation; level++) {
             for (int currLine = 0; currLine < lines.size(); currLine++) {
-                String line = lines.get(currLine);
+                if(lines.get(currLine).trim().isEmpty()) continue;
 
-                if(line.trim().isEmpty()) continue;
-
-                if(line.startsWith("alias")) {
-                    aliases.put(line.split(" ")[3], line.split(" ")[1]);
+                if(lines.get(currLine).startsWith("alias")) {
+                    aliases.put(lines.get(currLine).split(" ")[3], lines.get(currLine).split(" ")[1]);
                     continue;
                 }
 
-                if (StringTools.indentation(line) == level) {
+                if (StringTools.indentation(lines.get(currLine)) == level) {
                     Node node = new Node();
                     boolean func = false;
 
-                    if (line.trim().endsWith("{")) {
-                        if (line.trim().startsWith("repeat")) {
-                            node.repetitions = Integer.parseInt(lines.get(currLine).trim().split(" ")[1]);
-                        }else if (line.trim().contains("func")) {
+                    if (lines.get(currLine).trim().endsWith("{")) {
+                        if (lines.get(currLine).trim().contains("func")) {
                             functions.put(lines.get(currLine).trim().split(" ")[1], node);
                             func = true;
                         }
@@ -193,7 +209,7 @@ public class Parser {
                             if (StringTools.indentation(lines.get(pointer)) == level) {
                                 for (int i = currLine; i <= pointer; i++) nodeMap[i] = node;
 
-                                node.level = level + (func ? 0 : 1);
+                                node.level = level + (func ? 0 : 4);
                                 if (level != 0) node.parentNode = nodeMap[currLine - 1];
 
                                 node.id = currId++;

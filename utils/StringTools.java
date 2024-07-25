@@ -6,7 +6,7 @@ public class StringTools {
 
         for(int i = 0; i < s.length(); i++) {
             if(s.charAt(i) != ' ' && s.charAt(i) != '\t') break;
-            offset++;
+            offset+=4;
         }
 
         return offset;
@@ -25,6 +25,6 @@ public class StringTools {
             }
         }
 
-        return -1;
+        return parentLevel * 10;
     }
 }
