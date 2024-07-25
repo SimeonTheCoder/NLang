@@ -33,6 +33,11 @@ public enum BasicOperation implements Operation{
             float result = valA + valB;
             memory[(Integer) instruction[8]] = result;
         }
+
+        @Override
+        public String help() {
+            return "Calculates the sum arg0 + arg1";
+        }
     },
     SUB {
         @Override
@@ -47,6 +52,11 @@ public enum BasicOperation implements Operation{
 
             float result = valA - valB;
             memory[(Integer) instruction[8]] = result;
+        }
+
+        @Override
+        public String help() {
+            return "Calculates the difference arg0 - arg1";
         }
     },
     MUL {
@@ -63,6 +73,11 @@ public enum BasicOperation implements Operation{
             float result = valA * valB;
             memory[(Integer) instruction[8]] = result;
         }
+
+        @Override
+        public String help() {
+            return "Calculates the product arg0 * arg1";
+        }
     },
     DIV {
         @Override
@@ -77,6 +92,11 @@ public enum BasicOperation implements Operation{
 
             float result = valA / valB;
             memory[(Integer) instruction[8]] = result;
+        }
+
+        @Override
+        public String help() {
+            return "Calculates arg0 / arg1";
         }
     },
     SET {
@@ -98,6 +118,11 @@ public enum BasicOperation implements Operation{
 
             memory[address] = val;
         }
+
+        @Override
+        public String help() {
+            return "The value of the arg0 is set to arg1";
+        }
     },
     PRINT {
         @Override
@@ -108,6 +133,11 @@ public enum BasicOperation implements Operation{
         @Override
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) {
             System.out.print(Interpreter.getValue(instruction[1], memory));
+        }
+
+        @Override
+        public String help() {
+            return "Prints a number, without putting a new line at the end";
         }
     },
     INP {
@@ -121,6 +151,11 @@ public enum BasicOperation implements Operation{
             Scanner scanner = new Scanner(System.in);
             memory[(Integer) instruction[8]] = Float.parseFloat(scanner.nextLine());
         }
+
+        @Override
+        public String help() {
+            return "Reads a number from the console";
+        }
     },
     CALL {
         @Override
@@ -133,6 +168,11 @@ public enum BasicOperation implements Operation{
                 throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             if(instruction[1] == null) throw new IllegalArgumentException("Function does not exist.");
             Interpreter.interpret((Node) instruction[1], memory);
+        }
+
+        @Override
+        public String help() {
+            return "Calls a the function under the name of arg0";
         }
     },
     IF {
@@ -162,6 +202,18 @@ public enum BasicOperation implements Operation{
             float result = valA + valB;
             memory[(Integer) instruction[8]] = result;
         }
+
+        @Override
+        public String help() {
+            return "Compares arg0 and arg1 based on arg2. Valid values for arg2 are:\n" +
+                    "== (EQUAL)\n" +
+                    "> (GREATER_THAN)\n" +
+                    "< (LESS_THAN)\n" +
+                    ">= (GREATER_EQUAL)\n" +
+                    "<= (LESS_EQUAL)\n" +
+                    "!= (NOT_EQUAL)\n" +
+                    "If the result of the comparison is true, the function arg3 is called, otherwise - arg4";
+        }
     },
     PRINTLN {
         @Override
@@ -172,6 +224,11 @@ public enum BasicOperation implements Operation{
         @Override
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) {
             System.out.println(Interpreter.getValue(instruction[1], memory));
+        }
+
+        @Override
+        public String help() {
+            return "Prints a number, puts a new line at the end";
         }
     },
 //    ALLOC {
@@ -210,7 +267,12 @@ public enum BasicOperation implements Operation{
 
             writableFiles.get(filename).content.append(val).append(System.lineSeparator());
         }
-    },
+
+    @Override
+    public String help() {
+        return "Appends arg1 to a file with filename arg0. Does nothing unless a file was made first using MKFILE and closed with CLOSE after the writing is finished";
+    }
+},
     MKFILE {
         @Override
         public ObjType[] getArguments() {
@@ -225,6 +287,11 @@ public enum BasicOperation implements Operation{
             writableFiles.put(
                     filename, new WritableFile( new File(filename) )
             );
+        }
+
+        @Override
+        public String help() {
+            return "Creates a file with a filename arg0";
         }
     },
     CLOSE {
@@ -249,6 +316,11 @@ public enum BasicOperation implements Operation{
                 readableFiles.get(filename).scanner.close();
             }
         }
+
+        @Override
+        public String help() {
+            return "Closes a file for writing and reading. Cannot do that unless a file has already been opened / made";
+        }
     },
     OPEN {
         @Override
@@ -264,6 +336,11 @@ public enum BasicOperation implements Operation{
             readableFiles.put(
                     filename, new ReadableFile( new File(filename) )
             );
+        }
+
+        @Override
+        public String help() {
+            return "Opens a file with filename arg0 for reading";
         }
     },
     READLINE {
@@ -286,6 +363,11 @@ public enum BasicOperation implements Operation{
             );
 
             memory[(Integer) instruction[8]] = data;
+        }
+
+        @Override
+        public String help() {
+            return "Reads a single line from an already opened file with filename arg0. Arg1 specifies what value should be read. The only valid value for arg1 is NUMBER";
         }
     },
     IMPORT {
@@ -328,6 +410,11 @@ public enum BasicOperation implements Operation{
             }
 
             memory[(Integer) instruction[8]] = memory2[1 + 1536];
+        }
+
+        @Override
+        public String help() {
+            return "Calls the function with name arg1 from NLang file with .nlp extension and name arg0. The arguments passed down are treated as registers by the called function. The returned output by the IMPORT instruction is the value at g1 in the function's memory";
         }
     };
 }

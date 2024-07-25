@@ -14,4 +14,6 @@ public interface Operation {
     default void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 
     }
+
+    String help();
 }

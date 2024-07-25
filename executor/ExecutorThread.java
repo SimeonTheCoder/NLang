@@ -4,7 +4,6 @@ import parser.Interpreter;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,16 +26,5 @@ public class ExecutorThread extends Thread {
                 throw new RuntimeException(e);
             }
         }
-
-//        for(int i = 0; i < queue.size(); i++) {
-//            try {
-//                if(queue.containsKey(i)) {
-//                    Interpreter.executeInstruction(queue.get(i), memory);
-//                }
-//            } catch (IOException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
-//                     InstantiationException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
     }
 }

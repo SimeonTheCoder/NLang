@@ -20,19 +20,13 @@ public class Parser {
     public HashMap<String, String> aliases;
 
     public int extractGlobalAddress(String data, float[] memory) {
-        if(data.charAt(0) == '$') {
-            return Integer.parseInt(data.substring(1)) + 1536;
-        }
+        char first = data.charAt(0);
+        char second = data.charAt(1);
 
-        if(data.charAt(1) >= '0' && data.charAt(1) <= '9') {
-            int address = Integer.parseInt(data.substring(1));
-            return address + 1536;
-        }
-        else if (data.charAt(1) == '%') {
+        if (second >= '0' && second <= '9') {
+            return Integer.parseInt(data.substring(1)) + (first == '$' ? 0 : 1536);
+        } else {
             return Integer.parseInt(data.substring(2)) + 1536 + 2048;
-        }
-        else {
-            throw new IllegalArgumentException("Address " + data + " doesn't exist");
         }
     }
 
@@ -118,28 +112,32 @@ public class Parser {
 
         for (int i = 0; i < tokens.length - 1; i++) {
             if (tokens[i].equals("as")) {
-                if(aliases.containsKey(tokens[i + 1])) {
-                    tokens[i + 1] = aliases.get(tokens[i + 1]);
+                String nextToken = tokens[i + 1];
+
+                if(aliases.containsKey(nextToken)) {
+                    nextToken = aliases.get(nextToken);
                 }
 
-                if (tokens[i + 1].charAt(0) == '&') {
+                char first = nextToken.charAt(0);
+
+                if (first == '&') {
                     int valSlot = tokens[i + 1].charAt(1) - '0';
-                    args[8] = "a" + node.parentNode.id * 10 + --valSlot;
-                } else if(tokens[i + 1].charAt(0) == '.') {
-                    args[8] = extractLocalAddress(tokens[i + 1], node, memory);
-                } else if (tokens[i + 1].charAt(0) == '%' || tokens[i].charAt(0) == '$') {
-                    args[8] = extractGlobalAddress(tokens[i + 1], memory);
+                    args[8] = node.parentNode.id * 10 + --valSlot;
+                } else if(first == '.') {
+                    args[8] = extractLocalAddress(nextToken, node, memory);
+                } else if (first == '%' || first == '$') {
+                    args[8] = extractGlobalAddress(nextToken, memory);
                 }
             }
             if (tokens[i].equals("repeat")) {
-                try {
-                    args[7] = Integer.parseInt(tokens[i + 1]);
-                } catch (Exception exception) {
-                    if(tokens[i + 1].charAt(0) == '.') {
-                        args[7] = extractLocalAddress(tokens[i + 1], node, memory);
-                    } else {
-                        args[7] = extractGlobalAddress(tokens[i + 1], memory);
-                    }
+                String nextToken = tokens[i + 1];
+
+                if(nextToken.charAt(0) >= '0' && nextToken.charAt(0) <= '9') {
+                    args[7] = Integer.parseInt(nextToken);
+                } else if (tokens[i + 1].charAt(0) == '.') {
+                    args[7] = extractLocalAddress(nextToken, node, memory);
+                } else {
+                    args[7] = extractGlobalAddress(nextToken, memory);
                 }
             }
         }
@@ -176,8 +174,7 @@ public class Parser {
 
                     if (lines.get(currLine).trim().endsWith("{")) {
                         if (lines.get(currLine).trim().startsWith("repeat")) {
-                            int amount = Integer.parseInt(lines.get(currLine).trim().split(" ")[1]);
-                            node.repetitions = amount;
+                            node.repetitions = Integer.parseInt(lines.get(currLine).trim().split(" ")[1]);
                         }else if (lines.get(currLine).trim().contains("func")) {
                             functions.put(lines.get(currLine).trim().split(" ")[1], node);
                             func = true;

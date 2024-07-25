@@ -2,12 +2,10 @@ import data.ObjType;
 import data.ReadableFile;
 import data.WritableFile;
 import operations.Operation;
-import parser.Interpreter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -21,6 +19,11 @@ public enum CustomOperation implements Operation {
         @Override
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles) throws IOException {
             System.out.println("Pong!");
+        }
+
+        @Override
+        public String help() {
+            return "";
         }
     };
 //    WINMAKE {
