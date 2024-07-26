@@ -12,9 +12,6 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        args = new String[1];
-        args[0] = "fact";
-
         MemoryManager.set(2048, 512, 4);
 
         try {
@@ -66,21 +63,7 @@ public class Main {
                     threadManager.threads[i].join();
                 }
 
-//                boolean working = true;
-//
-//                while (working) {
-//                    working = false;
-//
-//                    for(int i = 0; i < threadManager.threads.length; i++) {
-//                        if (threadManager.threads[i].isAlive()) {
-//                            working = true;
-//                            break;
-//                        }
-//                    }
-//                }
-
                 long end = System.currentTimeMillis();
-
                 System.out.println(end - start);
             } else {
                 if(args.length != 0 && args[0].startsWith("--")) {
