@@ -8,7 +8,6 @@ import parser.Parser;
 import utils.EnumUtils;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.*;
 
 public class Main {
@@ -16,6 +15,8 @@ public class Main {
         MemoryManager.set(2048, 512, 4);
 
         try {
+            int debug = -1;
+
             if (args.length != 0 && !args[0].startsWith("--")) {
                 EnumUtils.initClass();
 
@@ -33,6 +34,7 @@ public class Main {
                             case 'L' -> MemoryManager.LOCAL_AMOUNT = val;
                             case 'T' -> MemoryManager.TOTAL_AMOUNT = val;
                             case 'N' -> MemoryManager.NODE_SLOTS = val;
+                            case 'D' -> debug = val;
                         }
 
                         toSkip++;
@@ -66,6 +68,22 @@ public class Main {
 
                 long end = System.currentTimeMillis();
                 System.out.println(end - start);
+
+                if(debug == 0) {
+                    for (int i = 0; i < MemoryManager.LOCAL_AMOUNT; i ++) {
+                        if(memory[i] == 0f) continue;
+                        System.out.println("$" + i + " -> " + memory[i]);
+                    }
+                    for (int i = MemoryManager.LOCAL_AMOUNT; i < MemoryManager.TOTAL_AMOUNT; i ++) {
+                        if(memory[i] == 0f) continue;
+                        System.out.println("$" + i + " (%" + (i - MemoryManager.LOCAL_AMOUNT) + ") -> " + memory[i]);
+                    }
+                } else if (debug == 1) {
+                    for (int i = 0; i < parser.nodesArr.length; i ++) {
+                        if(parser.nodesArr[i] == null) continue;
+                        System.out.println(i + " -> " + parser.nodesArr[i].instruction[0]);
+                    }
+                }
             } else {
                 if(args.length != 0 && args[0].startsWith("--")) {
                     if (args[0].equals("--get")) {

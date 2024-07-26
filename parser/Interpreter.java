@@ -15,6 +15,8 @@ public class Interpreter {
     public static HashMap<String, ReadableFile> readableFiles = new HashMap<>();
 
     public static void interpret(Node node, float[] memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        if (node == null) return;
+
         if (node.instruction != null) {
             executeInstruction(node.instruction, memory);
             if (!node.childNodes.isEmpty()) {

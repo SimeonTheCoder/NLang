@@ -19,7 +19,12 @@ import java.util.Scanner;
 
 public class Parser {
     public HashMap<String, Node> functions;
+    public Node[] nodesArr;
     public HashMap<String, String> aliases;
+
+    public Parser() {
+        nodesArr = new Node[MemoryManager.LOCAL_AMOUNT / MemoryManager.NODE_SLOTS];
+    }
 
     public int extractGlobalAddress(String data, float[] memory) {
         char first = data.charAt(0);
@@ -90,9 +95,12 @@ public class Parser {
                         node1.instruction[0] = BasicOperation.NULL;
                         args[i] = node1;
                         break;
+                    } else if(tokens[i].charAt(0) == '@') {
+                        args[i] = nodesArr[Integer.parseInt(tokens[i].substring(1))];
+                    } else {
+                        args[i] = functions.get(tokens[i]);
                     }
 
-                    args[i] = functions.get(tokens[i]);
                     break;
                 }
 
@@ -277,6 +285,7 @@ public class Parser {
                         }
 
                         node.id = currId++;
+                        nodesArr[node.id] = node;
 
                         nodeMap[currLine] = node;
 
