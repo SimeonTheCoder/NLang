@@ -188,7 +188,7 @@ public class Parser {
 
         int currId = 0;
 
-        for (int level = 0; level <= maxIndentation; level++) {
+        for (int level = 0; level <= maxIndentation; level+=4) {
             for (int currLine = 0; currLine < lines.size(); currLine++) {
                 if(lines.get(currLine).trim().isEmpty() || lines.get(currLine).trim().equals("}")) continue;
 

@@ -7,7 +7,6 @@ import parser.Linker;
 import parser.Parser;
 import transformer.ProgramTransformer;
 import utils.EnumUtils;
-import utils.StringTools;
 
 import java.io.File;
 import java.util.*;
