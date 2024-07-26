@@ -5,7 +5,9 @@ import operations.Operation;
 import parser.Interpreter;
 import parser.Linker;
 import parser.Parser;
+import transformer.ProgramTransformer;
 import utils.EnumUtils;
+import utils.StringTools;
 
 import java.io.File;
 import java.util.*;
@@ -82,6 +84,21 @@ public class Main {
                     for (int i = 0; i < parser.nodesArr.length; i ++) {
                         if(parser.nodesArr[i] == null) continue;
                         System.out.println(i + " -> " + parser.nodesArr[i].instruction[0]);
+                    }
+                } else if (debug == 2) {
+                    Scanner scanner = new Scanner(new File(args[toReadArg] + ".nlp"));
+
+                    List<String> lines = new ArrayList<>();
+
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        lines.add(line);
+                    }
+
+                    ProgramTransformer.transform(lines);
+
+                    for (String line : lines) {
+                        System.out.println(line);
                     }
                 }
             } else {

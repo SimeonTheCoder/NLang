@@ -6,6 +6,7 @@ import memory.MemoryManager;
 import nodes.Node;
 import operations.BasicOperation;
 import operations.Operation;
+import transformer.ProgramTransformer;
 import utils.EnumUtils;
 import utils.StringTools;
 
@@ -176,50 +177,7 @@ public class Parser {
             lines.add(line);
         }
 
-        lines.replaceAll(String::trim);
-
-        int indentation = 0;
-        boolean inFunction = false;
-        int nonFunctionIndent = 0;
-
-        for(int i = 0; i < lines.size(); i ++) {
-            if(lines.get(i).trim().isEmpty()) {
-                lines.remove(i--);
-                continue;
-            }
-
-            if(lines.get(i).startsWith("func") || lines.get(i).startsWith("}") || lines.get(i).startsWith("{")) {
-                inFunction = inFunction || lines.get(i).startsWith("func");
-
-                if(lines.get(i).startsWith("{")) {
-                    nonFunctionIndent = indentation;
-                }
-
-                indentation = (lines.get(i).startsWith("{") || !inFunction) ? indentation : 0;
-
-                if(lines.get(i).startsWith("}") && !inFunction) indentation = nonFunctionIndent;
-
-                lines.set(i, "\t".repeat(indentation) + lines.get(i));
-
-                if(lines.get(i).startsWith("func") || (lines.get(i).contains("{") && !inFunction)) indentation++;
-                if(lines.get(i).startsWith("}") && inFunction) inFunction = false;
-            } else {
-                if (lines.get(i).startsWith("alias")) continue;
-
-                lines.set(i, "\t".repeat(indentation) + lines.get(i));
-
-                if (!lines.get(i).endsWith("|")) {
-                    indentation ++;
-                } else {
-                    lines.set(i, lines.get(i).replace("|", ""));
-                }
-            }
-
-            if(lines.get(i).contains("(") || lines.get(i).contains(")")) {
-                lines.set(i, lines.get(i).replace("(", ""));
-                lines.set(i, lines.get(i).replace(")", ""));
-            }
-        }
+        ProgramTransformer.transform(lines);
 
         for (String line : lines) {
             maxIndentation = Math.max(maxIndentation, StringTools.indentation(line));
