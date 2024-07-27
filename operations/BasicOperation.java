@@ -521,5 +521,36 @@ public enum BasicOperation implements Operation{
         public String help() {
             return "";
         }
+    }, INPARR {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.STRING};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+            Scanner scanner = new Scanner(System.in);
+
+            List<Float> content = Arrays.stream(scanner.nextLine().split(" ")).map(Float::parseFloat).toList();
+
+            int firstFreeIndex = MemoryManager.ARR_OFFSET;
+
+            for (Map.Entry<String, Array> entry : arrays.entrySet()) {
+                firstFreeIndex = Math.max(firstFreeIndex, entry.getValue().end);
+            }
+
+            int size = content.size();
+
+            arrays.put((String) instruction[1], new Array(firstFreeIndex, size));
+
+            for(int i = firstFreeIndex; i < firstFreeIndex + size; i ++) {
+                memory[i] = content.get(i - firstFreeIndex);
+            }
+        }
+
+        @Override
+        public String help() {
+            return "Reads an array from the console";
+        }
     };
 }
