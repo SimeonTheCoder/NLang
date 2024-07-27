@@ -446,7 +446,9 @@ public enum BasicOperation implements Operation{
                 firstFreeIndex = Math.max(firstFreeIndex, entry.getValue().end);
             }
 
-            arrays.put((String) instruction[1], new Array(firstFreeIndex, (int) Math.floor((Float) instruction[2])));
+            int size = (int) Math.floor(Interpreter.getValue(instruction[2], memory));
+
+            arrays.put((String) instruction[1], new Array(firstFreeIndex, size));
         }
 
         @Override
