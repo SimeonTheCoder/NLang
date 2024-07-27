@@ -85,6 +85,10 @@ public class ProgramTransformer {
                 } else {
                     lines.set(i, "call " + lines.get(i));
                 }
+            } else if(line.contains("[]")) {
+                lines.set(i, lines.get(i).replace("[", ""));
+                lines.set(i, lines.get(i).replace("]", ""));
+                lines.set(i, String.format("arr " + lines.get(i)));
             }
 
             if(line.startsWith("func") || line.startsWith("}") || line.startsWith("{")) {
@@ -116,6 +120,9 @@ public class ProgramTransformer {
 
             lines.set(i, lines.get(i).replace("(", ""));
             lines.set(i, lines.get(i).replace(")", ""));
+
+            lines.set(i, lines.get(i).replace("[", ""));
+            lines.set(i, lines.get(i).replace("]", ""));
 
             if(lines.get(i).trim().startsWith(">") || lines.get(i).trim().startsWith("<")) {
                 lines.set(i, lines.get(i).replace(">", "inp"));

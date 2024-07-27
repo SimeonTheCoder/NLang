@@ -150,6 +150,10 @@ public class Parser {
             if (tokens[i].equals("repeat")) {
                 String nextToken = tokens[i + 1];
 
+                if(aliases.containsKey(nextToken)) {
+                    nextToken = aliases.get(nextToken);
+                }
+
                 if(nextToken.charAt(0) >= '0' && nextToken.charAt(0) <= '9') {
                     args[7] = Integer.parseInt(nextToken);
                 } else if (tokens[i + 1].charAt(0) == '.') {

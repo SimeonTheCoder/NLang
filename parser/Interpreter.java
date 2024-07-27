@@ -1,5 +1,6 @@
 package parser;
 
+import data.Array;
 import data.ReadableFile;
 import data.WritableFile;
 import memory.MemoryManager;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 public class Interpreter {
     public static HashMap<String, WritableFile> writableFiles = new HashMap<>();
     public static HashMap<String, ReadableFile> readableFiles = new HashMap<>();
+    public static HashMap<String, Array> arrays = new HashMap<>();
 
     public static void interpret(Node node, float[] memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         if (node == null) return;
@@ -50,12 +52,12 @@ public class Interpreter {
 
         if (instruction[7] != null) {
             Object value = instruction[7];
-            repetitions = (value instanceof String) ? (int) getValue(value, memory) : (Integer) value;
+            repetitions = (int) getValue(value, memory);
         }
 
         for (int l = 0; l < repetitions; l++) {
             if(instruction[0] == null) break;
-            ((Operation) instruction[0]).execute(instruction, memory, writableFiles, readableFiles);
+            ((Operation) instruction[0]).execute(instruction, memory, writableFiles, readableFiles, arrays);
         }
     }
 }

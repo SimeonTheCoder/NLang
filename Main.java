@@ -13,7 +13,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        MemoryManager.set(2048, 512, 4);
+        MemoryManager.set(2048, 128, 2, 1024);
 
         try {
             int debug = -1;
