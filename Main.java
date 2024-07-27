@@ -33,6 +33,7 @@ public class Main {
                     case 'L' -> MemoryManager.LOCAL_AMOUNT = val;
                     case 'T' -> MemoryManager.TOTAL_AMOUNT = val;
                     case 'N' -> MemoryManager.NODE_SLOTS = val;
+                    case 'A' -> MemoryManager.ARRAY_AMOUNT = val;
                     case 'D' -> debug = val;
                 }
 
