@@ -125,7 +125,7 @@ public class Main {
 
                         Runtime.getRuntime().exec("curl -o build/package.nlb " + repo);
 
-                        Scanner scanner = new Scanner(new File("package.nlb"));
+                        Scanner scanner = new Scanner(new File("build/package.nlb"));
 
                         while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
