@@ -20,10 +20,26 @@ public class ProgramTransformer {
                 continue;
             }
 
+            if(line.contains("#")) {
+                int index = line.indexOf("#");
+                String previous = line.substring(index + 1).trim();
+                String currLine = line.substring(0, index - 1).trim() + " .";
+
+                lines.add(i, previous);
+                lines.set(i-- + 1, currLine);
+
+                continue;
+            }
+
             if(line.startsWith(": ")) {
                 lines.remove(i--);
                 lines.set(i, lines.get(i) + line.substring(1));
                 joined = true;
+            }
+
+            if(line.endsWith("++")) {
+                String var = line.substring(0, line.length() - 2).trim();
+                lines.set(i, String.format("add %s 1 as %s", var, var));
             }
 
             if(line.startsWith("def")) {
@@ -31,13 +47,29 @@ public class ProgramTransformer {
                 lines.set(i, String.format("alias %%%d as %s", currGlobal++, varName));
             }
 
-            if(line.contains("+") || line.contains("-") ||line.contains("*") || line.contains("/")) {
+            if(lines.get(i).contains("+") || lines.get(i).contains("-") ||lines.get(i).contains("*") || lines.get(i).contains("/")
+                    || lines.get(i).contains("=") || (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">"))
+                    || (lines.get(i).contains("<") && !lines.get(i).contains("if") && !lines.get(i).startsWith("<"))) {
                 String[] tokens = lines.get(i).split(" ");
                 StringBuilder builder = new StringBuilder();
 
                 String temp = tokens[1];
                 tokens[1] = tokens[0];
                 tokens[0] = temp;
+
+                if (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">")) {
+                    tokens[0] = "set";
+                    String temp2 = tokens[2];
+                    tokens[2] = tokens[1];
+                    tokens[1] = temp2;
+                }
+
+                if (lines.get(i).contains("<") && !lines.get(i).contains("if") && !lines.get(i).startsWith("<")) {
+                    tokens[0] = "set";
+//                    String temp2 = tokens[2];
+//                    tokens[2] = tokens[1];
+//                    tokens[1] = temp2;
+                }
 
                 for (String token : tokens) {
                     builder.append(token);
@@ -94,6 +126,7 @@ public class ProgramTransformer {
             lines.set(i, lines.get(i).replace("-", "sub"));
             lines.set(i, lines.get(i).replace("*", "mul"));
             lines.set(i, lines.get(i).replace("/", "div"));
+            if(!lines.get(i).contains("if")) lines.set(i, lines.get(i).replace("=", "set"));
 
             joined = false;
         }
