@@ -20,8 +20,8 @@ public class ProgramTransformer {
                 continue;
             }
 
-            if(line.contains("#")) {
-                int index = line.indexOf("#");
+            if(line.contains(";")) {
+                int index = line.indexOf(";");
                 String previous = line.substring(index + 1).trim();
                 String currLine = line.substring(0, index - 1).trim() + " .";
 
