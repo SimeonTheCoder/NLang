@@ -76,7 +76,7 @@ public class Parser {
 
             if(multiple) {
                 args[i] = extractNumber(tokens[i], node, memory);
-                break;
+                continue;
             }
 
             switch (operation.getArguments()[i - 1]) {
@@ -86,6 +86,7 @@ public class Parser {
                     args[i] = extractNumber(tokens[i], node, memory);
 
                     if (operation.getArguments()[i - 1] == ObjType.MULTIPLE) multiple = true;
+                    if (multiple) args[i] = extractNumber(tokens[i], node, memory);
 
                     break;
                 }

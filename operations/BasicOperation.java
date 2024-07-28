@@ -189,6 +189,14 @@ public enum BasicOperation implements Operation{
                 throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             float valA = Interpreter.getValue(instruction[1], memory);
             float valB = Interpreter.getValue(instruction[3], memory);
+//
+//            if(instruction[4] instanceof Integer || instruction[5] instanceof Integer) {
+//                if(instruction[4] instanceof Integer) {
+//                    instruction[4] =
+//                } else {
+//
+//                }
+//            }
 
             switch ((Integer) instruction[2]) {
                 case 0 -> Interpreter.interpret((Node) instruction[valA == valB ? 4 : 5], memory);
@@ -216,7 +224,7 @@ public enum BasicOperation implements Operation{
                     "If the result of the comparison is true, the function arg3 is called, otherwise - arg4";
         }
     },
-    PRINTLN {
+    LN {
         @Override
         public ObjType[] getArguments() {
             return new ObjType[] {ObjType.NUMBER};
@@ -224,12 +232,28 @@ public enum BasicOperation implements Operation{
 
         @Override
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
-            System.out.println(Interpreter.getValue(instruction[1], memory));
+            System.out.println();
         }
 
         @Override
         public String help() {
-            return "Prints a number, puts a new line at the end";
+            return "Prints a new line";
+        }
+    },
+    PRINTSTR {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[]{ObjType.STRING};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            System.out.print(((String) instruction[1]).replace("_", " "));
+        }
+
+        @Override
+        public String help() {
+            return "Prints a string to the console";
         }
     },
 //    ALLOC {
@@ -551,6 +575,21 @@ public enum BasicOperation implements Operation{
         @Override
         public String help() {
             return "Reads an array from the console";
+        }
+    }, DELARR {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[]{ObjType.STRING};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            arrays.remove((String) instruction[1]);
+        }
+
+        @Override
+        public String help() {
+            return "";
         }
     };
 }

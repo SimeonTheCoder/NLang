@@ -20,6 +20,31 @@ public class ProgramTransformer {
                 continue;
             }
 
+            if(line.contains("\"")) {
+                int start = -1, end = -1;
+
+                for(int j = 0; j < line.length(); j ++) {
+                    if(line.charAt(j) == '"' && start == -1) {
+                        start = j;
+                    } else if(line.charAt(j) == '"') {
+                        end = j;
+                    }
+                }
+
+                String content = "";
+
+                StringBuilder builder = new StringBuilder();
+
+                for(int j = 0; j < line.length(); j ++) {
+                    if(line.charAt(j) == '"') continue;
+
+                    if(j >= start && j <= end && line.charAt(j) == ' ') builder.append("_");
+                    else builder.append(line.charAt(j));
+                }
+
+                lines.set(i, builder.toString());
+            }
+
             if(line.contains(";")) {
                 int index = line.indexOf(";");
                 String previous = line.substring(index + 1).trim();
@@ -47,36 +72,45 @@ public class ProgramTransformer {
                 lines.set(i, String.format("alias %%%d as %s", currGlobal++, varName));
             }
 
+            boolean isSign = false;
+
             if(lines.get(i).contains("+") || lines.get(i).contains("-") ||lines.get(i).contains("*") || lines.get(i).contains("/")
                     || lines.get(i).contains("=") || (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">"))
                     || (lines.get(i).contains("<") && !lines.get(i).contains("if") && !lines.get(i).startsWith("<"))) {
                 String[] tokens = lines.get(i).split(" ");
                 StringBuilder builder = new StringBuilder();
 
-                String temp = tokens[1];
-                tokens[1] = tokens[0];
-                tokens[0] = temp;
-
-                if (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">")) {
-                    tokens[0] = "set";
-                    String temp2 = tokens[2];
-                    tokens[2] = tokens[1];
-                    tokens[1] = temp2;
+                if((lines.get(i).contains("+") || lines.get(i).contains("-"))) {
+                    int index = lines.get(i).contains("+") ? lines.get(i).indexOf('+') : lines.get(i).indexOf('-');
+                    if(lines.get(i).charAt(index + 1) >= '0' && lines.get(i).charAt(index + 1) <= '9') isSign = true;
                 }
 
-                if (lines.get(i).contains("<") && !lines.get(i).contains("if") && !lines.get(i).startsWith("<")) {
-                    tokens[0] = "set";
+                if(!isSign) {
+                    String temp = tokens[1];
+                    tokens[1] = tokens[0];
+                    tokens[0] = temp;
+
+                    if (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">")) {
+                        tokens[0] = "set";
+                        String temp2 = tokens[2];
+                        tokens[2] = tokens[1];
+                        tokens[1] = temp2;
+                    }
+
+                    if (lines.get(i).contains("<") && !lines.get(i).contains("if") && !lines.get(i).startsWith("<")) {
+                        tokens[0] = "set";
 //                    String temp2 = tokens[2];
 //                    tokens[2] = tokens[1];
 //                    tokens[1] = temp2;
-                }
+                    }
 
-                for (String token : tokens) {
-                    builder.append(token);
-                    builder.append(" ");
-                }
+                    for (String token : tokens) {
+                        builder.append(token);
+                        builder.append(" ");
+                    }
 
-                lines.set(i, builder.toString().trim());
+                    lines.set(i, builder.toString().trim());
+                }
             }
 
             if(line.contains("()")) {
@@ -127,17 +161,23 @@ public class ProgramTransformer {
             if(lines.get(i).trim().startsWith(">") || lines.get(i).trim().startsWith("<")) {
                 lines.set(i, lines.get(i).replace(">", "inp"));
                 lines.set(i, lines.get(i).replace("<", "print"));
+
+                if(lines.get(i).contains("println")) {
+                    lines.set(i, lines.get(i).replace("ln", ""));
+                    lines.add(i+1, "ln");
+                }
             }
 
-            lines.set(i, lines.get(i).replace("+", "add"));
-            lines.set(i, lines.get(i).replace("-", "sub"));
+            if(!isSign) {
+                lines.set(i, lines.get(i).replace("+", "add"));
+                lines.set(i, lines.get(i).replace("-", "sub"));
+            }
+
             lines.set(i, lines.get(i).replace("*", "mul"));
             lines.set(i, lines.get(i).replace("/", "div"));
             if(!lines.get(i).contains("if")) lines.set(i, lines.get(i).replace("=", "set"));
 
             joined = false;
         }
-
-        System.out.println();
     }
 }

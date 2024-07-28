@@ -233,7 +233,7 @@ public enum CustomOperation implements Operation {
         public void paint(Graphics g) {
             super.paint(g);
 
-	    g.setColor(new Color(0, 0, 0, 16));
+            g.setColor(new Color(0, 0, 0, 16));
 
             for (int i = 0; i < points.size(); i ++) {
                 g.fillRect(points.get(i).x, points.get(i).y, 5, 5);
