@@ -198,18 +198,23 @@ public enum BasicOperation implements Operation{
 //                }
 //            }
 
+            int choice;
+
             switch ((Integer) instruction[2]) {
-                case 0 -> Interpreter.interpret((Node) instruction[valA == valB ? 4 : 5], memory);
-                case 1 -> Interpreter.interpret((Node) instruction[valA > valB ? 4 : 5], memory);
-                case 2 -> Interpreter.interpret((Node) instruction[valA < valB ? 4 : 5], memory);
-                case 3 -> Interpreter.interpret((Node) instruction[valA >= valB ? 4 : 5], memory);
-                case 4 -> Interpreter.interpret((Node) instruction[valA <= valB ? 4 : 5], memory);
-                case 5 -> Interpreter.interpret((Node) instruction[valA != valB ? 4 : 5], memory);
+                case 0 -> choice = valA == valB ? 4 : 5;
+                case 1 -> choice = valA > valB ? 4 : 5;
+                case 2 -> choice = valA < valB ? 4 : 5;
+                case 3 -> choice = valA >= valB ? 4 : 5;
+                case 4 -> choice = valA <= valB ? 4 : 5;
+                case 5 -> choice = valA != valB ? 4 : 5;
                 default -> throw new IllegalArgumentException("Invalid comparison");
             }
 
-            float result = valA + valB;
-            memory[(Integer) instruction[8]] = result;
+            if(((Node) instruction[choice]).instruction[0] == BasicOperation.NULL) {
+                return;
+            }
+
+            Interpreter.interpret((Node) instruction[choice], memory);
         }
 
         @Override
@@ -590,6 +595,21 @@ public enum BasicOperation implements Operation{
         @Override
         public String help() {
             return "";
+        }
+    }, EXIT {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[0];
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            System.exit(0);
+        }
+
+        @Override
+        public String help() {
+            return "Exits the program";
         }
     };
 }
