@@ -22,7 +22,7 @@
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            System.out.println("Pong!");
 //        }
 //
@@ -37,7 +37,7 @@
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            CustomOperation.pointer = new Node();
 //
 //            int count = 0;
@@ -65,7 +65,7 @@
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            Node node = new Node();
 //            node.parentNode = CustomOperation.pointer;
 //
@@ -96,7 +96,7 @@
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            int val = (int) Interpreter.getValue(instruction[1], memory);
 //            if(CustomOperation.pointer.childNodes.size() <= val) return;
 //            CustomOperation.pointer = CustomOperation.pointer.childNodes.get(val);
@@ -113,7 +113,7 @@
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            if(CustomOperation.pointer.parentNode == null) return;
 //            CustomOperation.pointer = CustomOperation.pointer.parentNode;
 //        }
@@ -129,7 +129,7 @@
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            int firstFreeIndex = MemoryManager.ARR_OFFSET;
 //
 //            for (Map.Entry<String, Array> entry : arrays.entrySet()) {
@@ -157,7 +157,7 @@
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            memory[(Integer) instruction[8]] = CustomOperation.pointer.childNodes.size();
 //        }
 //

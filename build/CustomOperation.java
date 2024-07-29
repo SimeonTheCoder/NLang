@@ -20,7 +20,7 @@ public enum CustomOperation implements Operation {
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
             System.out.println("Pong!");
         }
 
@@ -36,7 +36,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            CustomOperation.window = new Window(
 //                    "Hello, world!", Math.round((Float) instruction[1]), Math.round((Float) instruction[2])
 //            );
@@ -49,7 +49,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            CustomOperation.window.points.add(new Point(
 //                    Math.round(Interpreter.getValue(instruction[1], memory)),
 //                    Math.round(Interpreter.getValue(instruction[2], memory))
@@ -63,7 +63,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            CustomOperation.window.points.clear();
 //
 //            CustomOperation.window.linesStart.clear();
@@ -77,7 +77,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
 //            CustomOperation.window.linesStart.add(new Point(
 //                    Math.round(Interpreter.getValue(instruction[1], memory)),
 //                    Math.round(Interpreter.getValue(instruction[2], memory))
@@ -96,7 +96,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            memory.put((String) instruction[8], (float) Math.cos(Interpreter.getValue(instruction[1], memory)));
 //        }
 //    },
@@ -107,7 +107,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            memory.put((String) instruction[8], (float) Math.sin(Interpreter.getValue(instruction[1], memory)));
 //        }
 //    },
@@ -118,7 +118,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            memory.put((String) instruction[8], (float) Math.abs(Interpreter.getValue(instruction[1], memory)));
 //        }
 //    },
@@ -129,7 +129,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            memory.put((String) instruction[8], (float) Math.log(Interpreter.getValue(instruction[1], memory)));
 //        }
 //    },
@@ -140,7 +140,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            memory.put((String) instruction[8], (float) Math.exp(Interpreter.getValue(instruction[1], memory)));
 //        }
 //    },
@@ -151,7 +151,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            memory.put((String) instruction[8], (float) Math.pow(Interpreter.getValue(instruction[1], memory), Interpreter.getValue(instruction[2], memory)));
 //        }
 //    },
@@ -162,7 +162,7 @@ public enum CustomOperation implements Operation {
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException {
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException {
 //            memory.put((String) instruction[8], (float) Math.round(Interpreter.getValue(instruction[1], memory)));
 //        }
 //    };

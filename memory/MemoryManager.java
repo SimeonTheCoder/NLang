@@ -6,13 +6,15 @@ public class MemoryManager {
     public static int LOCAL_AMOUNT;
     public static int NODE_SLOTS;
     public static int ARRAY_AMOUNT;
+    public static int STRINGS_AMOUNT;
 
     public static int ARR_OFFSET;
 
-    public static void set(int totalAmount, int globalAmount, int nodeSlots, int arrayAmount) {
+    public static void set(int totalAmount, int globalAmount, int nodeSlots, int arrayAmount, int stringsAmount) {
         TOTAL_AMOUNT = totalAmount;
         GLOBAL_AMOUNT = globalAmount;
         ARRAY_AMOUNT = arrayAmount;
+        STRINGS_AMOUNT = stringsAmount;
 
         LOCAL_AMOUNT = TOTAL_AMOUNT - GLOBAL_AMOUNT - ARRAY_AMOUNT;
 

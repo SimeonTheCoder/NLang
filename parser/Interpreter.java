@@ -15,6 +15,7 @@ public class Interpreter {
     public static HashMap<String, WritableFile> writableFiles = new HashMap<>();
     public static HashMap<String, ReadableFile> readableFiles = new HashMap<>();
     public static HashMap<String, Array> arrays = new HashMap<>();
+    public static String[] stringsTable = new String[MemoryManager.STRINGS_AMOUNT];
 
     public static void interpret(Node node, float[] memory) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         if (node == null) return;
@@ -57,7 +58,7 @@ public class Interpreter {
 
         for (int l = 0; l < repetitions; l++) {
             if(instruction[0] == null) break;
-            ((Operation) instruction[0]).execute(instruction, memory, writableFiles, readableFiles, arrays);
+            ((Operation) instruction[0]).execute(instruction, memory, writableFiles, readableFiles, arrays, stringsTable);
         }
     }
 }

@@ -15,17 +15,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public enum BasicOperation implements Operation{
+public enum BasicOperation implements Operation {
     ADD {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.NUMBER, ObjType.NUMBER};
+            return new ObjType[]{ObjType.NUMBER, ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             float valA = Interpreter.getValue(instruction[1], memory);
             float valB = Interpreter.getValue(instruction[2], memory);
 
@@ -41,11 +40,11 @@ public enum BasicOperation implements Operation{
     SUB {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.NUMBER, ObjType.NUMBER};
+            return new ObjType[]{ObjType.NUMBER, ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             float valA = Interpreter.getValue(instruction[1], memory);
             float valB = Interpreter.getValue(instruction[2], memory);
 
@@ -61,11 +60,11 @@ public enum BasicOperation implements Operation{
     MUL {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.NUMBER, ObjType.NUMBER};
+            return new ObjType[]{ObjType.NUMBER, ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             float valA = Interpreter.getValue(instruction[1], memory);
             float valB = Interpreter.getValue(instruction[2], memory);
 
@@ -81,11 +80,11 @@ public enum BasicOperation implements Operation{
     DIV {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.NUMBER, ObjType.NUMBER};
+            return new ObjType[]{ObjType.NUMBER, ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             float valA = Interpreter.getValue(instruction[1], memory);
             float valB = Interpreter.getValue(instruction[2], memory);
 
@@ -101,19 +100,19 @@ public enum BasicOperation implements Operation{
     SET {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.NUMBER, ObjType.NUMBER};
+            return new ObjType[]{ObjType.NUMBER, ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             float val = Interpreter.getValue(instruction[2], memory);
 
             int address = (instruction[1] instanceof Float) ? (int) Math.floor((Float) instruction[1]) : (Integer) instruction[1];
 
-            if(address > MemoryManager.TOTAL_AMOUNT) {
+            if (address > MemoryManager.TOTAL_AMOUNT) {
                 address -= MemoryManager.TOTAL_AMOUNT;
                 address = (int) Math.floor(memory[address]) + MemoryManager.LOCAL_AMOUNT;
-            } else if(address < MemoryManager.LOCAL_AMOUNT) {
+            } else if (address < MemoryManager.LOCAL_AMOUNT) {
                 address = (int) Math.floor(memory[address]);
             }
 
@@ -128,11 +127,11 @@ public enum BasicOperation implements Operation{
     PRINT {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.NUMBER};
+            return new ObjType[]{ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             System.out.print(Interpreter.getValue(instruction[1], memory));
         }
 
@@ -140,15 +139,30 @@ public enum BasicOperation implements Operation{
         public String help() {
             return "Prints a number, without putting a new line at the end";
         }
+    }, PRINTLN {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[]{ObjType.NUMBER};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
+            System.out.println(Interpreter.getValue(instruction[1], memory));
+        }
+
+        @Override
+        public String help() {
+            return "Prints a number, putting a new line at the end";
+        }
     },
     INP {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {};
+            return new ObjType[]{};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             Scanner scanner = new Scanner(System.in);
             memory[(Integer) instruction[8]] = Float.parseFloat(scanner.nextLine());
         }
@@ -161,13 +175,13 @@ public enum BasicOperation implements Operation{
     CALL {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.FUNCTION};
+            return new ObjType[]{ObjType.FUNCTION};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-            if(instruction[1] == null) throw new IllegalArgumentException("Function does not exist.");
+            if (instruction[1] == null) throw new IllegalArgumentException("Function does not exist.");
             Interpreter.interpret((Node) instruction[1], memory);
         }
 
@@ -179,13 +193,13 @@ public enum BasicOperation implements Operation{
     IF {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {
+            return new ObjType[]{
                     ObjType.NUMBER, ObjType.ENUM, ObjType.NUMBER, ObjType.FUNCTION, ObjType.FUNCTION
             };
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             float valA = Interpreter.getValue(instruction[1], memory);
             float valB = Interpreter.getValue(instruction[3], memory);
@@ -210,7 +224,7 @@ public enum BasicOperation implements Operation{
                 default -> throw new IllegalArgumentException("Invalid comparison");
             }
 
-            if(((Node) instruction[choice]).instruction[0] == BasicOperation.NULL) {
+            if (((Node) instruction[choice]).instruction[0] == BasicOperation.NULL) {
                 return;
             }
 
@@ -232,11 +246,11 @@ public enum BasicOperation implements Operation{
     LN {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.NUMBER};
+            return new ObjType[]{ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             System.out.println();
         }
 
@@ -252,8 +266,18 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-            System.out.print(((String) instruction[1]).replace("_", " "));
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            String str = ((String) instruction[1]);
+
+            if (((String) instruction[1]).startsWith("#")) {
+                int stringIndex = Integer.parseInt(((String) instruction[1]).substring(1));
+                str = stringTable[stringIndex];
+            } else if(((String) instruction[1]).startsWith("%")) {
+                int stringIndex = (int) memory[(int) Integer.parseInt(((String) instruction[1]).substring(1)) + MemoryManager.LOCAL_AMOUNT];
+                str = stringTable[stringIndex];
+            }
+
+            System.out.print(str.replace("_", " "));
         }
 
         @Override
@@ -261,14 +285,14 @@ public enum BasicOperation implements Operation{
             return "Prints a string to the console";
         }
     },
-//    ALLOC {
+    //    ALLOC {
 //        @Override
 //        public ObjType[] getArguments() {
 //            return new ObjType[] {ObjType.NUMBER};
 //        }
 //
 //        @Override
-//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+//        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
 //                throws IOException {
 //            float val = Interpreter.getValue(instruction[1], memory);
 //
@@ -286,11 +310,11 @@ public enum BasicOperation implements Operation{
     WRITE {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.STRING, ObjType.NUMBER};
+            return new ObjType[]{ObjType.STRING, ObjType.NUMBER};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException {
             String filename = String.valueOf(instruction[1]);
             float val = Interpreter.getValue(instruction[2], memory);
@@ -298,24 +322,24 @@ public enum BasicOperation implements Operation{
             writableFiles.get(filename).content.append(val).append(System.lineSeparator());
         }
 
-    @Override
-    public String help() {
-        return "Appends arg1 to a file with filename arg0. Does nothing unless a file was made first using MKFILE and closed with CLOSE after the writing is finished";
-    }
-},
+        @Override
+        public String help() {
+            return "Appends arg1 to a file with filename arg0. Does nothing unless a file was made first using MKFILE and closed with CLOSE after the writing is finished";
+        }
+    },
     MKFILE {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.STRING};
+            return new ObjType[]{ObjType.STRING};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException {
             String filename = String.valueOf(instruction[1]);
 
             writableFiles.put(
-                    filename, new WritableFile( new File(filename) )
+                    filename, new WritableFile(new File(filename))
             );
         }
 
@@ -327,18 +351,19 @@ public enum BasicOperation implements Operation{
     CLOSE {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.STRING};
+            return new ObjType[]{ObjType.STRING};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException {
             String filename = String.valueOf(instruction[1]);
 
-            if(writableFiles.containsKey(filename)) {
+            if (writableFiles.containsKey(filename)) {
                 FileWriter writer = new FileWriter(filename);
 
-                if(!writableFiles.containsKey(filename)) throw new IllegalArgumentException("File " + filename + " isn't open");
+                if (!writableFiles.containsKey(filename))
+                    throw new IllegalArgumentException("File " + filename + " isn't open");
 
                 writer.write(writableFiles.get(filename).content.toString());
                 writer.close();
@@ -355,16 +380,16 @@ public enum BasicOperation implements Operation{
     OPEN {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.STRING};
+            return new ObjType[]{ObjType.STRING};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException {
             String filename = String.valueOf(instruction[1]);
 
             readableFiles.put(
-                    filename, new ReadableFile( new File(filename) )
+                    filename, new ReadableFile(new File(filename))
             );
         }
 
@@ -376,17 +401,18 @@ public enum BasicOperation implements Operation{
     READLINE {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.STRING, ObjType.ENUM};
+            return new ObjType[]{ObjType.STRING, ObjType.ENUM};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException {
             if ((Integer) instruction[2] != 6) return;
 
             String filename = String.valueOf(instruction[1]);
 
-            if(!readableFiles.containsKey(filename)) throw new IllegalArgumentException("File " + filename + " isn't open");
+            if (!readableFiles.containsKey(filename))
+                throw new IllegalArgumentException("File " + filename + " isn't open");
 
             float data = Float.parseFloat(
                     readableFiles.get(String.valueOf(instruction[1])).scanner.nextLine()
@@ -403,18 +429,18 @@ public enum BasicOperation implements Operation{
     IMPORT {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.STRING, ObjType.STRING, ObjType.MULTIPLE};
+            return new ObjType[]{ObjType.STRING, ObjType.STRING, ObjType.MULTIPLE};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays)
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             float[] memory2 = new float[MemoryManager.TOTAL_AMOUNT];
 
             List<String> args = new ArrayList<>();
 
-            for(int i = 3; i < 7; i++) {
-                if(instruction[i] == null) continue;
+            for (int i = 3; i < 7; i++) {
+                if (instruction[i] == null) continue;
                 args.add(String.valueOf(Interpreter.getValue(instruction[i], memory)));
             }
 
@@ -453,7 +479,7 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             return;
         }
 
@@ -468,7 +494,7 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             int firstFreeIndex = MemoryManager.ARR_OFFSET;
 
             for (Map.Entry<String, Array> entry : arrays.entrySet()) {
@@ -491,7 +517,7 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             int index = (int) Math.floor(Interpreter.getValue(instruction[2], memory));
 
             float val = Interpreter.getValue(arrays.get((String) instruction[1]).index(index), memory);
@@ -509,7 +535,7 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             memory[(Integer) instruction[8]] = arrays.get((String) instruction[1]).length;
         }
 
@@ -524,7 +550,7 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             int index = (int) Math.floor(Interpreter.getValue(instruction[2], memory));
             memory[(Integer) instruction[8]] = arrays.get((String) instruction[1]).index(index);
         }
@@ -540,7 +566,7 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             Random random = new Random();
 
             memory[(Integer) instruction[8]] = random.nextFloat((Float) instruction[1], (Float) instruction[2]);
@@ -553,11 +579,11 @@ public enum BasicOperation implements Operation{
     }, INPARR {
         @Override
         public ObjType[] getArguments() {
-            return new ObjType[] {ObjType.STRING};
+            return new ObjType[]{ObjType.STRING};
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             Scanner scanner = new Scanner(System.in);
 
             List<Float> content = Arrays.stream(scanner.nextLine().split(" ")).map(Float::parseFloat).toList();
@@ -572,7 +598,7 @@ public enum BasicOperation implements Operation{
 
             arrays.put((String) instruction[1], new Array(firstFreeIndex, size));
 
-            for(int i = firstFreeIndex; i < firstFreeIndex + size; i ++) {
+            for (int i = firstFreeIndex; i < firstFreeIndex + size; i++) {
                 memory[i] = content.get(i - firstFreeIndex);
             }
         }
@@ -588,7 +614,7 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             arrays.remove((String) instruction[1]);
         }
 
@@ -603,13 +629,63 @@ public enum BasicOperation implements Operation{
         }
 
         @Override
-        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
             System.exit(0);
         }
 
         @Override
         public String help() {
             return "Exits the program";
+        }
+    }, INPSTR {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[0];
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            Scanner scanner = new Scanner(System.in);
+            String str = scanner.nextLine();
+
+            for (int i = 0; i < stringTable.length; i++) {
+                if (stringTable[i] == null) {
+                    stringTable[i] = str;
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public String help() {
+            return "Reads a string from the console and saves it into the string table";
+        }
+    }, SETSTR {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[]{ObjType.NUMBER, ObjType.STRING};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            int index = (int) Interpreter.getValue(instruction[1], memory);
+
+            String str = ((String) instruction[2]);
+
+            if (((String) instruction[2]).startsWith("#")) {
+                int stringIndex = Integer.parseInt(((String) instruction[2]).substring(1));
+                str = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("$")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1))];
+                str = stringTable[stringIndex];
+            }
+
+            stringTable[index] = str;
+        }
+
+        @Override
+        public String help() {
+            return "Sets the string with the current index to be equal to the entered string";
         }
     };
 }

@@ -102,7 +102,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        MemoryManager.set(2048, 128, 2, 1024);
+        MemoryManager.set(2048, 128, 2, 1024, 128);
 
         try {
             if (args.length != 0 && !args[0].startsWith("--")) {
