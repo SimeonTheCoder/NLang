@@ -630,6 +630,7 @@ public enum BasicOperation implements Operation {
 
         @Override
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            new java.util.Scanner(System.in).nextLine();
             System.exit(0);
         }
 
