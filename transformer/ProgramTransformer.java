@@ -67,6 +67,11 @@ public class ProgramTransformer {
                 lines.set(i, String.format("add %s 1 as %s", var, var));
             }
 
+            if(line.endsWith("--")) {
+                String var = line.substring(0, line.length() - 2).trim();
+                lines.set(i, String.format("sub %s 1 as %s", var, var));
+            }
+
             if(line.startsWith("def")) {
                 String varName = lines.get(i).trim().split(" ")[1];
                 lines.set(i, String.format("alias %%%d as %s", currGlobal++, varName));
@@ -75,7 +80,7 @@ public class ProgramTransformer {
             boolean isSign = false;
 
             if(lines.get(i).contains("+") || lines.get(i).contains("-") ||lines.get(i).contains("*") || lines.get(i).contains("/")
-                    || lines.get(i).contains("=") || (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">"))
+                    || (lines.get(i).contains("=") && !lines.get(i).contains("==")) || (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">"))
                     || (lines.get(i).contains("<") && !lines.get(i).contains("if") && !lines.get(i).startsWith("<"))) {
                 String[] tokens = lines.get(i).split(" ");
                 StringBuilder builder = new StringBuilder();
