@@ -67,7 +67,8 @@ public class Main {
         }
 
         long end = System.currentTimeMillis();
-        System.out.println(end - start);
+
+        if (debug != 3) System.out.println(end - start);
 
         if (debug == 0) {
             for (int i = 0; i < MemoryManager.LOCAL_AMOUNT; i++) {

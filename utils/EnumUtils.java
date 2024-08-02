@@ -20,7 +20,7 @@ public class EnumUtils {
     static {
         try {
             classLoader = URLClassLoader.newInstance(new URL[]{new File("").toURI().toURL()});
-            System.out.println(classLoader.getURLs()[0].getPath());
+//            System.out.println(classLoader.getURLs()[0].getPath());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
