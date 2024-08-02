@@ -679,6 +679,9 @@ public enum BasicOperation implements Operation {
             } else if(((String) instruction[2]).startsWith("$")) {
                 int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1))];
                 str = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("%")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1)) + MemoryManager.LOCAL_AMOUNT];
+                str = stringTable[stringIndex];
             }
 
             stringTable[index] = str;
@@ -687,6 +690,47 @@ public enum BasicOperation implements Operation {
         @Override
         public String help() {
             return "Sets the string with the current index to be equal to the entered string";
+        }
+    }, STREQU {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.STRING, ObjType.STRING};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            String a = ((String) instruction[1]);
+
+            if (((String) instruction[1]).startsWith("#")) {
+                int stringIndex = Integer.parseInt(((String) instruction[1]).substring(1));
+                a = stringTable[stringIndex];
+            } else if(((String) instruction[1]).startsWith("$")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[1]).substring(1))];
+                a = stringTable[stringIndex];
+            } else if(((String) instruction[1]).startsWith("%")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[1]).substring(1)) + MemoryManager.LOCAL_AMOUNT];
+                a = stringTable[stringIndex];
+            }
+
+            String b = ((String) instruction[2]);
+
+            if (((String) instruction[2]).startsWith("#")) {
+                int stringIndex = Integer.parseInt(((String) instruction[2]).substring(1));
+                b = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("$")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1))];
+                b = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("%")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1)) + MemoryManager.LOCAL_AMOUNT];
+                b = stringTable[stringIndex];
+            }
+
+            memory[(Integer) instruction[8]] = a.equals(b) ? 1 : 0;
+        }
+
+        @Override
+        public String help() {
+            return "Returns 1 if 2 strings equal each other";
         }
     };
 }
