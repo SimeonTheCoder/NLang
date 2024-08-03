@@ -337,9 +337,21 @@ public enum BasicOperation implements Operation {
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
                 throws IOException {
             String filename = String.valueOf(instruction[1]);
-            String val = (String) instruction[2];
 
-            writableFiles.get(filename).content.append(val).append(System.lineSeparator());
+            String str = ((String) instruction[2]);
+
+            if (((String) instruction[2]).startsWith("#")) {
+                int stringIndex = Integer.parseInt(((String) instruction[2]).substring(1));
+                str = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("$")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1))];
+                str = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("%")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1)) + MemoryManager.LOCAL_AMOUNT];
+                str = stringTable[stringIndex];
+            }
+
+            writableFiles.get(filename).content.append(str).append(System.lineSeparator());
         }
 
         @Override
