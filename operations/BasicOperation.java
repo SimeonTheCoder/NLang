@@ -327,6 +327,26 @@ public enum BasicOperation implements Operation {
             return "Appends arg1 to a file with filename arg0. Does nothing unless a file was made first using MKFILE and closed with CLOSE after the writing is finished";
         }
     },
+    WRITESTR {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[]{ObjType.STRING, ObjType.STRING};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable)
+                throws IOException {
+            String filename = String.valueOf(instruction[1]);
+            String val = (String) instruction[2];
+
+            writableFiles.get(filename).content.append(val).append(System.lineSeparator());
+        }
+
+        @Override
+        public String help() {
+            return "Appends arg1 to a file with filename arg0. Does nothing unless a file was made first using MKFILE and closed with CLOSE after the writing is finished";
+        }
+    },
     MKFILE {
         @Override
         public ObjType[] getArguments() {
