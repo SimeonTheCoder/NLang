@@ -126,7 +126,7 @@ public class Main {
 
                 while (!line.equals("exit")) {
                     if (line.startsWith("args")) {
-                        String[] tokens = line.split(" ");
+                        String[] tokens = line.split("\\s+");
 
                         Operation operation = EnumUtils.getOperation(tokens[1].toUpperCase());
 
@@ -136,7 +136,7 @@ public class Main {
 
                         System.out.println();
                     } else if (line.startsWith("help")) {
-                        String[] tokens = line.split(" ");
+                        String[] tokens = line.split("\\s+");
 
                         System.out.print("( ");
 
@@ -147,7 +147,7 @@ public class Main {
 
                         System.out.println(")\n" + operation.help());
                     } else if (line.startsWith("exec")) {
-                        executeFromFile(line.substring(4).trim().split(" "));
+                        executeFromFile(line.substring(4).trim().split("\\s+"));
                     } else if (line.chars().allMatch(Character::isDigit)) {
                         Node node = new Node();
                         node.id = nodeId++;

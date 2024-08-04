@@ -1,5 +1,6 @@
 package transformer;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ProgramTransformer {
@@ -73,8 +74,16 @@ public class ProgramTransformer {
             }
 
             if(line.startsWith("def")) {
-                String varName = lines.get(i).trim().split(" ")[1];
-                lines.set(i, String.format("alias %%%d as %s", currGlobal++, varName));
+                String currLine = lines.get(i);
+                lines.remove(i);
+
+                String[] names = currLine.trim().split("\\s+");
+                int size = names.length;
+
+                for (int j = 1; j < size; j ++) {
+                    String varName = names[j];
+                    lines.add(j, String.format("alias %%%d as %s", currGlobal++, varName));
+                }
             }
 
             boolean isSign = false;
@@ -82,7 +91,7 @@ public class ProgramTransformer {
             if(lines.get(i).contains("+") || lines.get(i).contains("-") ||lines.get(i).contains("*") || lines.get(i).contains("/")
                     || (lines.get(i).contains("=") && !lines.get(i).contains("==")) || (lines.get(i).contains(">") && !lines.get(i).contains("if") && !lines.get(i).startsWith(">"))
                     || (lines.get(i).contains("<") && !lines.get(i).contains("if") && !lines.get(i).startsWith("<"))) {
-                String[] tokens = lines.get(i).split(" ");
+                String[] tokens = lines.get(i).split("\\s+");
                 StringBuilder builder = new StringBuilder();
 
                 if((lines.get(i).contains("+") || lines.get(i).contains("-"))) {

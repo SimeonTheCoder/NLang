@@ -198,7 +198,7 @@ public class Parser {
                 if(lines.get(currLine).trim().isEmpty() || lines.get(currLine).trim().equals("}")) continue;
 
                 if(lines.get(currLine).startsWith("alias")) {
-                    aliases.put(lines.get(currLine).split(" ")[3], lines.get(currLine).split(" ")[1]);
+                    aliases.put(lines.get(currLine).split("\\s+")[3], lines.get(currLine).split("\\s+")[1]);
                     continue;
                 }
 
@@ -208,7 +208,7 @@ public class Parser {
 
                     if (lines.get(currLine).trim().endsWith("{")) {
                         if (lines.get(currLine).trim().contains("func")) {
-                            functions.put(lines.get(currLine).trim().split(" ")[1], node);
+                            functions.put(lines.get(currLine).trim().split("\\s+")[1], node);
                             func = true;
                         }
 

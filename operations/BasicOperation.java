@@ -618,7 +618,7 @@ public enum BasicOperation implements Operation {
         public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) {
             Scanner scanner = new Scanner(System.in);
 
-            List<Float> content = Arrays.stream(scanner.nextLine().split(" ")).map(Float::parseFloat).toList();
+            List<Float> content = Arrays.stream(scanner.nextLine().split("\\s+")).map(Float::parseFloat).toList();
 
             int firstFreeIndex = MemoryManager.ARR_OFFSET;
 
