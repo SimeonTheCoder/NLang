@@ -32,5 +32,7 @@ public class Node {
 
         this.parentNode = copy.parentNode;
         this.repetitions = copy.repetitions;
+
+        this.instruction = copy.instruction.clone();
     }
 }
