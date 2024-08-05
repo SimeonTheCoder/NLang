@@ -1,6 +1,5 @@
 package transformer;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ProgramTransformer {
@@ -82,7 +81,7 @@ public class ProgramTransformer {
 
                 for (int j = 1; j < size; j ++) {
                     String varName = names[j];
-                    lines.add(j, String.format("alias %%%d as %s", currGlobal++, varName));
+                    lines.add(j + i - 1, String.format("alias %%%d as %s", currGlobal++, varName));
                 }
             }
 
