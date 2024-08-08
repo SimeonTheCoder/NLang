@@ -764,5 +764,46 @@ public enum BasicOperation implements Operation {
         public String help() {
             return "Returns 1 if 2 strings equal each other";
         }
+    }, STRCON {
+        @Override
+        public ObjType[] getArguments() {
+            return new ObjType[] {ObjType.STRING, ObjType.STRING, ObjType.NUMBER};
+        }
+
+        @Override
+        public void execute(Object[] instruction, float[] memory, HashMap<String, WritableFile> writableFiles, HashMap<String, ReadableFile> readableFiles, HashMap<String, Array> arrays, String[] stringTable) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+            String a = ((String) instruction[1]);
+
+            if (((String) instruction[1]).startsWith("#")) {
+                int stringIndex = Integer.parseInt(((String) instruction[1]).substring(1));
+                a = stringTable[stringIndex];
+            } else if(((String) instruction[1]).startsWith("$")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[1]).substring(1))];
+                a = stringTable[stringIndex];
+            } else if(((String) instruction[1]).startsWith("%")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[1]).substring(1)) + MemoryManager.LOCAL_AMOUNT];
+                a = stringTable[stringIndex];
+            }
+
+            String b = ((String) instruction[2]);
+
+            if (((String) instruction[2]).startsWith("#")) {
+                int stringIndex = Integer.parseInt(((String) instruction[2]).substring(1));
+                b = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("$")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1))];
+                b = stringTable[stringIndex];
+            } else if(((String) instruction[2]).startsWith("%")) {
+                int stringIndex = (int) memory[Integer.parseInt(((String) instruction[2]).substring(1)) + MemoryManager.LOCAL_AMOUNT];
+                b = stringTable[stringIndex];
+            }
+
+            stringTable[(int) Interpreter.getValue(instruction[3], memory)] = a + b;
+        }
+
+        @Override
+        public String help() {
+            return "Concatenates two strings";
+        }
     };
 }
